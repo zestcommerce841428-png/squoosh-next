@@ -42,12 +42,12 @@ export default function Header() {
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
           {/* Logo */}
-          <Link href="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Box component={Link} href="/" sx={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Box component="img" src="/icon.png" alt="Squoosh Next Logo" sx={{ width: 24, height: 24, borderRadius: "4px" }} />
             <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>
               Squoosh Next
             </Typography>
-          </Link>
+          </Box>
 
           {/* Navigation Links */}
           <Stack direction="row" spacing={{ xs: 1, md: 3 }} sx={{ display: { xs: 'none', md: 'flex' } }}>

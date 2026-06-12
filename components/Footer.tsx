@@ -3,6 +3,14 @@
 import Link from 'next/link';
 import { Container, Grid, Typography, Stack, Box, Divider } from '@mui/material';
 
+const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  <Box component={Link} href={href} sx={{ textDecoration: 'none', color: 'inherit' }}>
+    <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>
+      {children}
+    </Typography>
+  </Box>
+);
+
 export default function Footer() {
   return (
     <Box sx={{ borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', py: 6, mt: 'auto' }}>
@@ -11,12 +19,12 @@ export default function Footer() {
           {/* Brand */}
           <Grid item xs={12} md={3}>
             <Stack spacing={2}>
-              <Link href="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Box component={Link} href="/" sx={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Box sx={{ width: 10, height: 10, borderRadius: '50%', background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
                 <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>
                   Squoosh Next
                 </Typography>
-              </Link>
+              </Box>
               <Typography variant="body2" color="text.secondary">
                 Professional client-side image compression and format optimization tool. Compress, convert, and adjust 100+ formats instantly without server uploads.
               </Typography>
@@ -29,45 +37,25 @@ export default function Footer() {
               Optimizers
             </Typography>
             <Stack spacing={1.5}>
-              <Link href="/compress-jpeg" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>JPEG Compressor</Typography>
-              </Link>
-              <Link href="/compress-png" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>PNG Compressor</Typography>
-              </Link>
-              <Link href="/compress-webp" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>WebP Compressor</Typography>
-              </Link>
-              <Link href="/compress-avif" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>AVIF Compressor</Typography>
-              </Link>
-              <Link href="/compress-pdf" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>PDF Compressor</Typography>
-              </Link>
-              <Link href="/batch-compress" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>Batch Compressor</Typography>
-              </Link>
+              <NavLink href="/compress-jpeg">JPEG Compressor</NavLink>
+              <NavLink href="/compress-png">PNG Compressor</NavLink>
+              <NavLink href="/compress-webp">WebP Compressor</NavLink>
+              <NavLink href="/compress-avif">AVIF Compressor</NavLink>
+              <NavLink href="/compress-pdf">PDF Compressor</NavLink>
+              <NavLink href="/batch-compress">Batch Compressor</NavLink>
             </Stack>
           </Grid>
 
-          {/* Company */}
+          {/* Resources */}
           <Grid item xs={6} sm={4} md={3}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2, textTransform: 'uppercase' }}>
               Resources
             </Typography>
             <Stack spacing={1.5}>
-              <Link href="/about" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>About Us</Typography>
-              </Link>
-              <Link href="/features" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>Features Catalog</Typography>
-              </Link>
-              <Link href="/blog" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>Latest Blog</Typography>
-              </Link>
-              <Link href="/contact" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>Contact Support</Typography>
-              </Link>
+              <NavLink href="/about">About Us</NavLink>
+              <NavLink href="/features">Features Catalog</NavLink>
+              <NavLink href="/blog">Latest Blog</NavLink>
+              <NavLink href="/contact">Contact Support</NavLink>
             </Stack>
           </Grid>
 
@@ -77,21 +65,11 @@ export default function Footer() {
               Legal & Compliance
             </Typography>
             <Stack spacing={1.5}>
-              <Link href="/privacy" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>Privacy Policy</Typography>
-              </Link>
-              <Link href="/terms" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>Terms of Service</Typography>
-              </Link>
-              <Link href="/cookies" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>Cookie Policy</Typography>
-              </Link>
-              <Link href="/gdpr" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>GDPR Compliance</Typography>
-              </Link>
-              <Link href="/ccpa" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: 'primary.main' } }}>CCPA Compliance</Typography>
-              </Link>
+              <NavLink href="/privacy">Privacy Policy</NavLink>
+              <NavLink href="/terms">Terms of Service</NavLink>
+              <NavLink href="/cookies">Cookie Policy</NavLink>
+              <NavLink href="/gdpr">GDPR Compliance</NavLink>
+              <NavLink href="/ccpa">CCPA Compliance</NavLink>
             </Stack>
           </Grid>
         </Grid>
@@ -104,7 +82,15 @@ export default function Footer() {
               &copy; {new Date().getFullYear()} Squoosh Next. Developed & Maintained by <strong>Naushad Alam</strong> | <strong>Zest Tech Solution</strong> | Powered by <strong>Vercel</strong>.
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              Contact: <strong>Naushad Alam</strong> | WhatsApp: <strong>7492068998</strong> | Email: <a href="mailto:contact@zestcommerce.in" style={{ color: 'inherit', textDecoration: 'underline' }}>contact@zestcommerce.in</a> | Web: <a href="https://zesttechsolution.cloud" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>zesttechsolution.cloud</a>
+              Contact: <strong>Naushad Alam</strong> | WhatsApp: <strong>7492068998</strong> |{' '}
+              Email:{' '}
+              <Box component="a" href="mailto:contact@zestcommerce.in" sx={{ color: 'inherit', textDecoration: 'underline' }}>
+                contact@zestcommerce.in
+              </Box>{' '}
+              | Web:{' '}
+              <Box component="a" href="https://zesttechsolution.cloud" target="_blank" rel="noopener noreferrer" sx={{ color: 'inherit', textDecoration: 'underline' }}>
+                zesttechsolution.cloud
+              </Box>
             </Typography>
           </Stack>
           <Stack direction="row" spacing={2}>
