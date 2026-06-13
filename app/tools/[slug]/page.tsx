@@ -9,6 +9,15 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { FEATURES_DATA, type FeatureItem } from '../../features/features-data';
+import {
+  ACCEPT_STRING,
+  NATIVE_CODEC_FORMATS,
+  CUSTOM_ENCODER_FORMATS,
+  ALL_EXPORT_FORMATS,
+  EXT_BY_VALUE,
+  hasQualityControl,
+  isLosslessFormat,
+} from '../../constants/imageFormats';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -646,11 +655,10 @@ export default function ToolRunnerPage({ params }: PageProps) {
   const [pVignette, setPVignette] = useState(30);
   const [bgColor, setBgColor] = useState('#ffffff');
 
-  // Derive export extension from format
+  // Derive export extension from format using global registry
   useEffect(() => {
     const fmt = archetype === 'compress' ? compFmt : convertFmt;
-    const map: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif', 'custom/bmp': 'bmp', 'custom/svg': 'svg' };
-    setExportExt(map[fmt] || 'png');
+    setExportExt(EXT_BY_VALUE[fmt] ?? 'png');
   }, [compFmt, convertFmt, archetype]);
 
   const buildParams = useCallback((): RenderParams => ({
@@ -1039,14 +1047,14 @@ export default function ToolRunnerPage({ params }: PageProps) {
             <FormControl fullWidth size="small">
               <InputLabel>Codec</InputLabel>
               <Select value={compFmt} label="Codec" onChange={e=>setCompFmt(e.target.value)}>
-                <MenuItem value="image/jpeg">MozJPEG (.jpg)</MenuItem>
-                <MenuItem value="image/png">OxiPNG (.png)</MenuItem>
-                <MenuItem value="image/webp">WebP (.webp)</MenuItem>
-                <MenuItem value="image/avif">AVIF (.avif)</MenuItem>
-                <MenuItem value="custom/bmp">BMP (.bmp)</MenuItem>
+                {[...NATIVE_CODEC_FORMATS, ...CUSTOM_ENCODER_FORMATS.filter(f =>
+                  ['custom/bmp','custom/tga','custom/ppm','custom/pgm','custom/ff'].includes(f.value)
+                )].map(f => (
+                  <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>
+                ))}
               </Select>
             </FormControl>
-            {compFmt !== 'image/png' && compFmt !== 'custom/bmp' && (
+            {hasQualityControl(compFmt) && (
               <Box>
                 <Box sx={{ display:'flex', justifyContent:'space-between', mb:0.5 }}>
                   <Typography variant="caption">Quality</Typography>
@@ -1064,16 +1072,14 @@ export default function ToolRunnerPage({ params }: PageProps) {
           <Stack spacing={2.5}>
             <FormControl fullWidth size="small">
               <InputLabel>Output Format</InputLabel>
-              <Select value={convertFmt} label="Output Format" onChange={e=>setConvertFmt(e.target.value)}>
-                <MenuItem value="image/jpeg">JPEG (.jpg)</MenuItem>
-                <MenuItem value="image/png">PNG (.png)</MenuItem>
-                <MenuItem value="image/webp">WebP (.webp)</MenuItem>
-                <MenuItem value="image/avif">AVIF (.avif)</MenuItem>
-                <MenuItem value="custom/bmp">BMP (.bmp)</MenuItem>
-                <MenuItem value="custom/svg">SVG Wrapper (.svg)</MenuItem>
+              <Select value={convertFmt} label="Output Format" onChange={e=>setConvertFmt(e.target.value)}
+                MenuProps={{ PaperProps: { style: { maxHeight: 340 } } }}>
+                {ALL_EXPORT_FORMATS.map(f => (
+                  <MenuItem key={f.value} value={f.value} sx={{ fontSize:'0.82rem' }}>{f.label}</MenuItem>
+                ))}
               </Select>
             </FormControl>
-            {convertFmt !== 'image/png' && convertFmt !== 'custom/bmp' && convertFmt !== 'custom/svg' && (
+            {hasQualityControl(convertFmt) && (
               <Box>
                 <Box sx={{ display:'flex', justifyContent:'space-between', mb:0.5 }}>
                   <Typography variant="caption">Quality</Typography>
@@ -1081,6 +1087,9 @@ export default function ToolRunnerPage({ params }: PageProps) {
                 </Box>
                 <Slider value={convertQuality} min={5} max={100} onChange={(_,v)=>setConvertQuality(v as number)} size="small" />
               </Box>
+            )}
+            {isLosslessFormat(convertFmt) && (
+              <Alert severity="info" sx={{ fontSize:'0.8rem' }}>Lossless format — quality slider not applicable.</Alert>
             )}
           </Stack>
         );
@@ -1308,7 +1317,7 @@ export default function ToolRunnerPage({ params }: PageProps) {
                 )}
                 <Stack direction="row" spacing={2} flexWrap="wrap" justifyContent="center">
                   <Button variant="outlined" component="label">
-                    Replace Image<input hidden type="file" accept="image/*" onChange={e=>handleFile(e.target.files?.[0])} />
+                    Replace Image<input hidden type="file" accept={ACCEPT_STRING} onChange={e=>handleFile(e.target.files?.[0])} />
                   </Button>
                   {archetype !== 'ascii' && archetype !== 'metadata' && archetype !== 'histogram' && archetype !== 'palette' && (
                     <Button variant="contained" component="a" href={exportUrl||'#'} download={`squoosh-${getSlug(tool.name)}.${exportExt}`} disabled={!exportUrl||rendering}>
@@ -1328,7 +1337,7 @@ export default function ToolRunnerPage({ params }: PageProps) {
                   Load any JPEG, PNG, WebP, AVIF, GIF, BMP, or SVG file to begin using <strong>{tool.name}</strong>.
                 </Typography>
                 <Button variant="contained" component="label" size="large" sx={{ fontWeight:700, px:4, py:1.5 }}>
-                  Select Image File<input hidden type="file" accept="image/*" onChange={e=>handleFile(e.target.files?.[0])} />
+                  Select Image File<input hidden type="file" accept={ACCEPT_STRING} onChange={e=>handleFile(e.target.files?.[0])} />
                 </Button>
               </Box>
             )}

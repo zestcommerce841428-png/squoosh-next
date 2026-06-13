@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import ThemeRegistry from 'components/ThemeRegistry';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import FloatingDashboard from 'components/FloatingDashboard';
@@ -47,7 +48,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body suppressHydrationWarning style={{ margin: 0, padding: 0 }}>
+      <body suppressHydrationWarning>
         {/* Google Analytics Integration */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
@@ -78,16 +79,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           strategy="afterInteractive"
         />
 
-        <ThemeRegistry>
-          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
-            <Header />
-            <Box component="main" sx={{ flexGrow: 1 }}>
-              {children}
+        <AppRouterCacheProvider options={{ key: 'css', enableCssLayer: true }}>
+          <ThemeRegistry>
+            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+              <Header />
+              <Box component="main" sx={{ flexGrow: 1 }}>
+                {children}
+              </Box>
+              <Footer />
+              <FloatingDashboard />
             </Box>
-            <Footer />
-            <FloatingDashboard />
-          </Box>
-        </ThemeRegistry>
+          </ThemeRegistry>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

@@ -118,13 +118,17 @@ interface HistoryItem {
   timestamp: string;
 }
 
-const formats = [
-  { label: 'MozJPEG', value: 'image/jpeg' },
-  { label: 'WebP (v8)', value: 'image/webp' },
-  { label: 'OxiPNG', value: 'image/png' },
-  { label: 'AVIF (AV1)', value: 'image/avif' },
-  { label: 'WebP2 (Experimental)', value: 'image/wp2' },
-];
+import {
+  ACCEPT_STRING,
+  ALL_EXPORT_FORMATS,
+  NATIVE_CODEC_FORMATS,
+  CUSTOM_ENCODER_FORMATS,
+  EXT_BY_VALUE,
+  hasQualityControl,
+  isLosslessFormat,
+} from '../constants/imageFormats';
+
+const formats = NATIVE_CODEC_FORMATS.map(f => ({ label: f.label.split(' — ')[0], value: f.value }));
 
 const presets = [
   { label: 'Balanced (Default)', value: 'balanced' },
@@ -133,17 +137,6 @@ const presets = [
   { label: 'Lossless Focus', value: 'lossless' },
 ];
 
-const FORMAT_CATEGORIES = {
-  Web: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'svg', 'bmp', 'ico', 'cur', 'apng', 'mng', 'flif', 'bpg'],
-  RAW: ['cr2', 'cr3', 'nef', 'arw', 'dng', 'orf', 'rw2', 'pef', 'raf', 'srw', 'mrw', 'erf', 'kdc', 'dcr'],
-  Vector: ['ai', 'eps', 'pdf', 'psd', 'psb', 'indd', 'cdr', 'svgz', 'cals', 'dxf', 'dwg', 'plt', 'hpgl'],
-  Textures: ['tga', 'dds', 'ktx', 'ktx2', 'astc', 'pvr', 'pvrtc', 'pkm', 'qoi', 'raw'],
-  Scientific: ['dcm', 'dicom', 'fits', 'fit', 'fts', 'hdf', 'hdr', 'exr'],
-  Exotic: ['tiff', 'tif', 'pcx', 'dcx', 'icns', 'ani', 'rle', 'dib', 'xbm', 'xpm', 'heic', 'heif', 'pcd', 'fpx', 'tpic', 'iff', 'lbm', 'ilbm', 'iff24', 'acorn', 'art', 'cin', 'g3', 'fax', 'jbg', 'jbig', 'jng', 'miff', 'mtv', 'otb', 'p7', 'palm', 'pam', 'pbm', 'pgm', 'pnm', 'ppm', 'pix', 'rad', 'rgba', 'sgi', 'sun', 'uyvy', 'vicar', 'viff', 'xwd', 'yuv', 'jp2', 'j2k', 'jpf', 'jpx', 'jpm', 'mj2']
-};
-
-const ALL_EXTENSIONS = Object.values(FORMAT_CATEGORIES).flat();
-const ACCEPT_STRING = ALL_EXTENSIONS.map(ext => `.${ext}`).join(',') + ',image/*';
 
 // Custom CRC32 calculation function for ZIP headers
 function crc32(buf: Uint8Array): number {
@@ -568,28 +561,8 @@ const updateHistogram = (sourceCanvas: HTMLCanvasElement, destCanvas: HTMLCanvas
   dCtx.globalCompositeOperation = 'source-over';
 };
 
-// Dynamically generate 100+ export extensions
-const EXPORT_FORMATS = [
-  { label: 'MozJPEG (.jpg)', value: 'image/jpeg', ext: 'jpg' },
-  { label: 'OxiPNG (.png)', value: 'image/png', ext: 'png' },
-  { label: 'WebP (.webp)', value: 'image/webp', ext: 'webp' },
-  { label: 'AVIF (.avif)', value: 'image/avif', ext: 'avif' },
-  { label: 'WebP2 (.wp2)', value: 'image/wp2', ext: 'wp2' },
-  { label: 'BMP Bitmap (.bmp)', value: 'custom/bmp', ext: 'bmp' },
-  { label: 'Targa TGA (.tga)', value: 'custom/tga', ext: 'tga' },
-  { label: 'ICO Icon (.ico)', value: 'custom/ico', ext: 'ico' },
-  { label: 'SVG Vector wrapper (.svg)', value: 'custom/svg', ext: 'svg' },
-  { label: 'HTML Canvas snippet (.html)', value: 'custom/html', ext: 'html' },
-  { label: 'CSS Background rule (.css)', value: 'custom/css', ext: 'css' },
-  { label: 'ASCII Art text (.txt)', value: 'custom/ascii', ext: 'txt' },
-  { label: 'JSON Metadata (.json)', value: 'custom/json', ext: 'json' },
-  { label: 'RAW RGBA binary (.bin)', value: 'custom/bin', ext: 'bin' },
-  ...ALL_EXTENSIONS.filter(ext => !['jpg', 'jpeg', 'png', 'webp', 'avif', 'wp2', 'bmp', 'tga', 'ico', 'svg', 'html', 'css', 'txt', 'json', 'bin'].includes(ext)).map(ext => ({
-    label: `${ext.toUpperCase()} Export Alias (.${ext})`,
-    value: `alias/${ext}`,
-    ext: ext
-  }))
-];
+// All export formats from global registry (150+ entries)
+const EXPORT_FORMATS = ALL_EXPORT_FORMATS;
 
 export default function ImageCompressor() {
   const { mode, toggleColorMode } = useColorMode();
