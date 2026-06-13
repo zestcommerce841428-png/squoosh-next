@@ -68,7 +68,7 @@ export async function encodeMozJPEG(
       '/codecs/mozjpeg/enc/mozjpeg_enc.wasm',
     ) as { encode: (d: BufferSource, w: number, h: number, o: object) => Uint8Array };
 
-    const encoded = mod.encode(data, width, height, {
+    const encoded = mod.encode(new Uint8Array(data), width, height, {
       quality,
       baseline: false,
       arithmetic: false,
@@ -110,7 +110,7 @@ export async function encodeWebP(
       '/codecs/webp/enc/webp_enc.wasm',
     ) as { encode: (d: BufferSource, w: number, h: number, o: object) => Uint8Array | null };
 
-    const encoded = mod.encode(data, width, height, {
+    const encoded = mod.encode(new Uint8Array(data), width, height, {
       quality,
       target_size: 0,
       target_PSNR: 0,
@@ -165,7 +165,7 @@ export async function encodeAVIF(
     // AVIF quality is inverted: lower cq = higher quality (0=best, 63=worst)
     const cqLevel = Math.round(((100 - quality) / 100) * 62);
 
-    const encoded = mod.encode(data, width, height, {
+    const encoded = mod.encode(new Uint8Array(data), width, height, {
       quality: cqLevel,
       qualityAlpha: cqLevel,
       denoiseLevel: 0,
@@ -204,7 +204,7 @@ export async function encodeJXL(
     // JXL distance: 0=lossless, 1=visually lossless, higher=more lossy
     const distance = opts.lossless ? 0 : Math.max(0.1, ((100 - quality) / 100) * 15);
 
-    const encoded = mod.encode(data, width, height, {
+    const encoded = mod.encode(new Uint8Array(data), width, height, {
       effort: opts.effort ?? 7,
       quality: distance,
       progressive_dc: -1,
@@ -233,6 +233,7 @@ export async function encodeOxiPNG(
     const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
 
     // Dynamically import the WASM-bindgen module
+    // @ts-ignore - Dynamic WASM module import
     const oxipngMod = await import(/* webpackIgnore: true */ '/codecs/oxipng/pkg/squoosh_oxipng.js');
     await oxipngMod.default('/codecs/oxipng/pkg/squoosh_oxipng_bg.wasm');
 

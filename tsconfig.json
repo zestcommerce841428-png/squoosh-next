@@ -35,6 +35,10 @@
     "app/**/*.tsx",
     "components/**/*.ts",
     "components/**/*.tsx",
+    "lib/**/*.ts",
+    "constants/**/*.ts",
+    "features/**/*.ts",
+    "features/**/*.tsx",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [

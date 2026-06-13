@@ -17,7 +17,7 @@ import {
   EXT_BY_VALUE,
   hasQualityControl,
   isLosslessFormat,
-} from '../../constants/imageFormats';
+} from 'constants/imageFormats';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

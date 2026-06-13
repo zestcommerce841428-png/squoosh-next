@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { AppBar, Toolbar, Typography, Button, Container, Stack, Box, IconButton } from '@mui/material';
 import { useColorMode } from './ThemeRegistry';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const SunIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -60,14 +61,15 @@ export default function Header() {
 
           {/* Actions */}
           <Stack direction="row" spacing={1.5} alignItems="center">
+            <LanguageSwitcher />
             <IconButton onClick={toggleColorMode} color="inherit" size="small">
               {mode === 'light' ? <MoonIcon /> : <SunIcon />}
             </IconButton>
-            <Button 
-              component={Link} 
-              href="/compress" 
-              variant="contained" 
-              color="primary" 
+            <Button
+              component={Link}
+              href="/compress"
+              variant="contained"
+              color="primary"
               size="small"
               sx={{ fontWeight: 700 }}
             >

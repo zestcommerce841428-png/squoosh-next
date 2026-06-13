@@ -80,9 +80,9 @@ export default async function BlogPostPage({ params }: Props) {
     <Container maxWidth="md" sx={{ py: 8 }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <Button component={Link} href="/blog" sx={{ mb: 4, fontWeight: 700 }}>
-        ← Back to Blog
-      </Button>
+      <Link href="/blog">
+        <Button sx={{ mb: 4, fontWeight: 700 }}>← Back to Blog</Button>
+      </Link>
 
       {/* Header */}
       <Box sx={{ mb: 5 }}>
@@ -137,8 +137,8 @@ export default async function BlogPostPage({ params }: Props) {
           Everything discussed in this article can be tested directly in Squoosh Next — no sign-up, no upload, 100% client-side.
         </Typography>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
-          <Button component={Link} href="/compress" variant="contained" sx={{ fontWeight: 700 }}>Open Compressor</Button>
-          <Button component={Link} href="/features" variant="outlined" sx={{ fontWeight: 700 }}>Browse 230 Tools</Button>
+          <Link href="/compress"><Button variant="contained" sx={{ fontWeight: 700 }}>Open Compressor</Button></Link>
+          <Link href="/features"><Button variant="outlined" sx={{ fontWeight: 700 }}>Browse 230 Tools</Button></Link>
         </Stack>
       </Card>
 
@@ -154,9 +154,9 @@ export default async function BlogPostPage({ params }: Props) {
                     <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>{rel.title}</Typography>
                     <Typography variant="caption" color="text.secondary">{rel.date} · {rel.readTime}</Typography>
                   </Box>
-                  <Button component={Link} href={`/blog/${rel.slug}`} size="small" variant="text" sx={{ fontWeight: 700, flexShrink: 0 }}>
-                    Read →
-                  </Button>
+                  <Link href={`/blog/${rel.slug}`}>
+                    <Button size="small" variant="text" sx={{ fontWeight: 700, flexShrink: 0 }}>Read →</Button>
+                  </Link>
                 </Stack>
               </Card>
             ))}

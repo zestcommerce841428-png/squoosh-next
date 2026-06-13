@@ -34,6 +34,7 @@ import {
   TableRow,
 } from '@mui/material';
 import { useColorMode } from './ThemeRegistry';
+import { trackImageCompression, trackBatchCompression, trackFormatConversion, trackDownload, trackError } from '../lib/analytics';
 
 // Simple SVG Icons
 const SunIcon = () => (
@@ -122,16 +123,17 @@ import {
   ACCEPT_STRING,
   ALL_EXPORT_FORMATS,
   ALL_INPUT_EXTENSIONS,
+  INPUT_FORMAT_CATEGORIES,
   NATIVE_CODEC_FORMATS,
   CUSTOM_ENCODER_FORMATS,
   EXT_BY_VALUE,
   hasQualityControl,
   isLosslessFormat,
-} from '../constants/imageFormats';
-import { encodeImage } from '../lib/codecs';
-import { detectFormat } from '../lib/magicBytes';
-import { readExif, exifToRows } from '../lib/exif';
-import { addHistoryRecord, getHistoryRecords, clearHistory, generateThumbnail, type HistoryRecord } from '../lib/imageDB';
+} from 'constants/imageFormats';
+import { encodeImage } from 'lib/codecs';
+import { detectFormat } from 'lib/magicBytes';
+import { readExif, exifToRows } from 'lib/exif';
+import { addHistoryRecord, getHistoryRecords, clearHistory, generateThumbnail, type HistoryRecord } from 'lib/imageDB';
 
 const formats = NATIVE_CODEC_FORMATS.map(f => ({ label: f.label.split(' — ')[0], value: f.value }));
 
@@ -1460,7 +1462,7 @@ export default function ImageCompressor() {
             progressive: mozProgressive,
             effort: format === 'image/png' ? pngLevel : undefined,
           });
-          blob = new Blob([result.data], { type: result.mimeType });
+          blob = new Blob([new Uint8Array(result.data)], { type: result.mimeType });
         } else {
           blob = await new Promise<Blob | null>((resolve) =>
             canvas.toBlob(
@@ -3196,7 +3198,7 @@ export default function ImageCompressor() {
             </Typography>
           </Box>
           <Grid container spacing={3}>
-            {Object.entries(FORMAT_CATEGORIES).map(([category, extList]) => (
+            {Object.entries(INPUT_FORMAT_CATEGORIES).map(([category, extList]) => (
               <Grid item xs={12} md={6} key={category}>
                 <Card sx={{ p: 2.5, height: '100%' }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5, textTransform: 'uppercase', color: 'primary.main', letterSpacing: '0.5px' }}>

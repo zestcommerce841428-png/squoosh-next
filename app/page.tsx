@@ -104,12 +104,16 @@ export default function HomePage() {
                   Compress, convert, resize, and edit with MozJPEG, WebP, AVIF, and OxiPNG codecs. 230 tools. 100+ formats. Zero server uploads — your images never leave your device.
                 </Typography>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                  <Button component={Link} href="/compress" variant="contained" color="primary" size="large" sx={{ px: 4, py: 1.5, fontWeight: 700, fontSize: '1rem' }}>
-                    Open Workspace
-                  </Button>
-                  <Button component={Link} href="/features" variant="outlined" color="primary" size="large" sx={{ px: 4, py: 1.5, fontWeight: 700, fontSize: '1rem' }}>
-                    Browse 230 Tools
-                  </Button>
+                  <Link href="/compress">
+                    <Button variant="contained" color="primary" size="large" sx={{ px: 4, py: 1.5, fontWeight: 700, fontSize: '1rem' }}>
+                      Open Workspace
+                    </Button>
+                  </Link>
+                  <Link href="/features">
+                    <Button variant="outlined" color="primary" size="large" sx={{ px: 4, py: 1.5, fontWeight: 700, fontSize: '1rem' }}>
+                      Browse 230 Tools
+                    </Button>
+                  </Link>
                 </Stack>
                 <Stack direction="row" spacing={1} flexWrap="wrap">
                   {['MozJPEG', 'WebP', 'AVIF', 'OxiPNG', 'Batch Mode', 'Histogram'].map(t => (
@@ -193,9 +197,11 @@ export default function HomePage() {
             ))}
           </Grid>
           <Box sx={{ textAlign: 'center', mt: 5 }}>
-            <Button component={Link} href="/features" variant="outlined" size="large" sx={{ fontWeight: 700, px: 5 }}>
-              View All 230 Features →
-            </Button>
+            <Link href="/features">
+              <Button variant="outlined" size="large" sx={{ fontWeight: 700, px: 5 }}>
+                View All 230 Features →
+              </Button>
+            </Link>
           </Box>
         </Container>
       </Box>
@@ -232,12 +238,16 @@ export default function HomePage() {
             No sign-up. No upload. No limit. Just drop your image and get a smaller, sharper file — instantly.
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
-            <Button component={Link} href="/compress" variant="contained" size="large" sx={{ fontWeight: 700, px: 5, py: 1.5 }}>
-              Start Compressing Free
-            </Button>
-            <Button component={Link} href="/blog" variant="outlined" size="large" sx={{ fontWeight: 700, px: 5, py: 1.5 }}>
-              Read the Blog
-            </Button>
+            <Link href="/compress">
+              <Button variant="contained" size="large" sx={{ fontWeight: 700, px: 5, py: 1.5 }}>
+                Start Compressing Free
+              </Button>
+            </Link>
+            <Link href="/blog">
+              <Button variant="outlined" size="large" sx={{ fontWeight: 700, px: 5, py: 1.5 }}>
+                Read the Blog
+              </Button>
+            </Link>
           </Stack>
         </Container>
       </Box>

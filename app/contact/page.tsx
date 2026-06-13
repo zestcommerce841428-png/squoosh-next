@@ -2,195 +2,388 @@
 
 import { useState } from 'react';
 import {
-  Container, Typography, Box, Stack, TextField, Button, Card, Grid,
-  Alert, Chip, CircularProgress, Divider, Paper,
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Paper,
+  Alert,
+  CircularProgress,
+  Stack,
+  Grid,
+  Card,
+  Link as MuiLink,
 } from '@mui/material';
+import { executeReCaptcha } from '../../lib/recaptcha';
+import { event } from '../../lib/analytics';
 
-interface FormState {
+// SVG Icons
+const MailIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+  </svg>
+);
+
+const PhoneIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+  </svg>
+);
+
+const MapPinIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+    <circle cx="12" cy="10" r="3"></circle>
+  </svg>
+);
+
+const SendIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="22" y1="2" x2="11" y2="13"></line>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+  </svg>
+);
+
+interface FormData {
   name: string;
   email: string;
   subject: string;
   message: string;
 }
 
-interface Errors {
-  name?: string;
-  email?: string;
-  subject?: string;
-  message?: string;
-}
-
-function validate(f: FormState): Errors {
-  const e: Errors = {};
-  if (!f.name.trim()) e.name = 'Name is required.';
-  if (!f.email.trim()) e.email = 'Email is required.';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) e.email = 'Enter a valid email address.';
-  if (!f.subject.trim()) e.subject = 'Subject is required.';
-  if (f.message.trim().length < 20) e.message = 'Message must be at least 20 characters.';
-  return e;
-}
-
-const CONTACT_EMAIL = 'contact@zestcommerce.in';
-
 export default function ContactPage() {
-  const [form, setForm] = useState<FormState>({ name: '', email: '', subject: '', message: '' });
-  const [errors, setErrors] = useState<Errors>({});
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  const handleChange = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm(prev => ({ ...prev, [field]: e.target.value }));
-    if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const errs = validate(form);
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    setStatus('sending');
-    const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`);
-    const subject = encodeURIComponent(`[Squoosh Next] ${form.subject}`);
-    const a = document.createElement('a');
-    a.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => { setStatus('sent'); setForm({ name: '', email: '', subject: '', message: '' }); }, 600);
-  };
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
 
-  const topicPresets = [
-    { label: 'Bug Report', subj: 'Bug Report: [describe the issue]', color: '#ef4444' },
-    { label: 'Feature Request', subj: 'Feature Request: [describe the feature]', color: '#8b5cf6' },
-    { label: 'Enterprise / Licensing', subj: 'Enterprise Inquiry', color: '#0ea5e9' },
-    { label: 'General Question', subj: 'General Question: [topic]', color: '#10b981' },
-  ];
+    try {
+      // Execute reCAPTCHA
+      const recaptchaToken = await executeReCaptcha('contact_form');
+
+      // Track form submission attempt
+      event('contact_form_submit', {
+        event_category: 'Contact',
+        event_label: formData.subject || 'No Subject',
+      });
+
+      // Send form data to backend API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, recaptchaToken }),
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send message');
+      }
+
+      setSuccess(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+
+      // Track successful submission
+      event('contact_form_success', {
+        event_category: 'Contact',
+        event_label: 'Form Submitted Successfully',
+      });
+    } catch (err: any) {
+      setError(err.message || 'Failed to send message. Please try again.');
+      event('contact_form_error', {
+        event_category: 'Contact',
+        event_label: err.message || 'Unknown Error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 8 }}>
-      <Box sx={{ mb: 6, textAlign: 'center' }}>
-        <Chip label="Open Source — Apache 2.0" variant="outlined" color="primary" sx={{ mb: 2, fontWeight: 700 }} />
-        <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, letterSpacing: '-0.5px' }}>
-          Get in Touch
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary" sx={{ maxWidth: 560, mx: 'auto', lineHeight: 1.7 }}>
-          Bug reports, feature ideas, licensing questions, or just want to say hello — we read every message.
-        </Typography>
-      </Box>
+    <Box sx={{ py: 8, bgcolor: 'background.default' }}>
+      <Container maxWidth="lg">
+        {/* Header */}
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: 900,
+              mb: 2,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Get in Touch
+          </Typography>
+          <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+            Have questions about Squoosh Next? Need support or want to collaborate? We'd love to hear from you!
+          </Typography>
+        </Box>
 
-      <Stack direction="row" spacing={1.5} flexWrap="wrap" justifyContent="center" sx={{ mb: 6 }}>
-        {topicPresets.map(t => (
-          <Button key={t.label} size="small" variant="outlined"
-            onClick={() => setForm(prev => ({ ...prev, subject: t.subj }))}
-            sx={{ borderColor: t.color, color: t.color, fontWeight: 700, '&:hover': { bgcolor: t.color + '18', borderColor: t.color } }}>
-            {t.label}
-          </Button>
-        ))}
-      </Stack>
-
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={7}>
-          <Card sx={{ p: 4 }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>Send a Message</Typography>
-
-            {status === 'sent' && (
-              <Alert severity="success" sx={{ mb: 3 }} onClose={() => setStatus('idle')}>
-                Your email client opened with the message pre-filled. If it did not open, email us directly at <strong>{CONTACT_EMAIL}</strong>.
-              </Alert>
-            )}
-
-            <Box component="form" onSubmit={handleSubmit} noValidate>
-              <Stack spacing={2.5}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Your Name" size="small" required
-                      value={form.name} onChange={handleChange('name')}
-                      error={!!errors.name} helperText={errors.name} />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Email Address" size="small" required type="email"
-                      value={form.email} onChange={handleChange('email')}
-                      error={!!errors.email} helperText={errors.email} />
-                  </Grid>
-                </Grid>
-                <TextField fullWidth label="Subject" size="small" required
-                  value={form.subject} onChange={handleChange('subject')}
-                  error={!!errors.subject} helperText={errors.subject} />
-                <TextField fullWidth label="Message" required multiline rows={5}
-                  value={form.message} onChange={handleChange('message')}
-                  error={!!errors.message} helperText={errors.message || 'Minimum 20 characters'}
-                  inputProps={{ minLength: 20 }} />
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Button type="submit" variant="contained" color="primary" size="large"
-                    disabled={status === 'sending'}
-                    sx={{ fontWeight: 700, px: 4 }}
-                    startIcon={status === 'sending' ? <CircularProgress size={16} color="inherit" /> : null}>
-                    {status === 'sending' ? 'Opening…' : 'Send Message'}
-                  </Button>
-                  <Typography variant="caption" color="text.secondary">
-                    Opens your email app with the message pre-filled.
+        <Grid container spacing={4}>
+          {/* Contact Information Cards */}
+          <Grid item xs={12} md={4}>
+            <Stack spacing={3}>
+              <Card
+                sx={{
+                  p: 3,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: '12px',
+                      bgcolor: 'rgba(255,255,255,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <MailIcon />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Email Us
                   </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ mb: 1, opacity: 0.9 }}>
+                  For general inquiries and support
+                </Typography>
+                <MuiLink
+                  href="mailto:contact@zestcommerce.in"
+                  sx={{ color: 'white', fontWeight: 600, textDecoration: 'none' }}
+                >
+                  contact@zestcommerce.in
+                </MuiLink>
+              </Card>
+
+              <Card
+                sx={{
+                  p: 3,
+                  background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                  color: 'white',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: '12px',
+                      bgcolor: 'rgba(255,255,255,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <PhoneIcon />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Call Us
+                  </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ mb: 1, opacity: 0.9 }}>
+                  Available Mon-Fri, 9AM-6PM IST
+                </Typography>
+                <MuiLink
+                  href="tel:+917492068998"
+                  sx={{ color: 'white', fontWeight: 600, textDecoration: 'none' }}
+                >
+                  +91 74920 68998
+                </MuiLink>
+              </Card>
+
+              <Card
+                sx={{
+                  p: 3,
+                  background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                  color: 'white',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: '12px',
+                      bgcolor: 'rgba(255,255,255,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <MapPinIcon />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Visit Us
+                  </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ mb: 1, opacity: 0.9 }}>
+                  Zest Tech Solution
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  India
+                </Typography>
+              </Card>
+            </Stack>
+          </Grid>
+
+          {/* Contact Form */}
+          <Grid item xs={12} md={8}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 4,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
+                Send us a Message
+              </Typography>
+
+              {success && (
+                <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess(false)}>
+                  Thank you for contacting us! We'll get back to you soon.
+                </Alert>
+              )}
+
+              {error && (
+                <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+                  {error}
+                </Alert>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <Stack spacing={3}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Your Name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        disabled={loading}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Your Email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        disabled={loading}
+                      />
+                    </Grid>
+                  </Grid>
+
+                  <TextField
+                    fullWidth
+                    label="Subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    multiline
+                    rows={6}
+                    required
+                    disabled={loading}
+                  />
+
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+                      This site is protected by reCAPTCHA and the Google{' '}
+                      <MuiLink href="https://policies.google.com/privacy" target="_blank">
+                        Privacy Policy
+                      </MuiLink>{' '}
+                      and{' '}
+                      <MuiLink href="https://policies.google.com/terms" target="_blank">
+                        Terms of Service
+                      </MuiLink>{' '}
+                      apply.
+                    </Typography>
+
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      size="large"
+                      disabled={loading}
+                      sx={{
+                        py: 1.5,
+                        px: 4,
+                        fontWeight: 700,
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                        },
+                      }}
+                      endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+                    >
+                      {loading ? 'Sending...' : 'Send Message'}
+                    </Button>
+                  </Box>
                 </Stack>
-              </Stack>
-            </Box>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={5}>
-          <Stack spacing={3}>
-            <Card sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Contact Details</Typography>
-              <Stack spacing={1.2}>
-                {([
-                  ['Business', 'Zest Tech Solution', null],
-                  ['Founder', 'Naushad Alam', null],
-                  ['WhatsApp', '+91 7492068998', 'https://wa.me/917492068998'],
-                  ['Email', CONTACT_EMAIL, `mailto:${CONTACT_EMAIL}`],
-                  ['Website', 'zesttechsolution.cloud', 'https://zesttechsolution.cloud'],
-                ] as [string, string, string | null][]).map(([k, v, href]) => (
-                  <Stack key={k} direction="row" spacing={1.5} alignItems="flex-start">
-                    <Typography variant="caption" sx={{ fontWeight: 700, minWidth: 72, color: 'text.secondary', pt: '2px' }}>{k}</Typography>
-                    {href ? (
-                      <Typography variant="body2" component="a" href={href} target={href.startsWith('mailto') ? undefined : '_blank'} rel="noopener noreferrer"
-                        sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>{v}</Typography>
-                    ) : (
-                      <Typography variant="body2">{v}</Typography>
-                    )}
-                  </Stack>
-                ))}
-              </Stack>
-            </Card>
-
-            <Card sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5 }}>Response Times</Typography>
-              <Stack spacing={1}>
-                {([
-                  ['Bug Reports', '24–48 hours'],
-                  ['Feature Requests', '3–5 business days'],
-                  ['Enterprise / Licensing', '1–2 business days'],
-                  ['General Questions', '2–3 business days'],
-                ] as [string, string][]).map(([t, r]) => (
-                  <Stack key={t} direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography variant="caption" color="text.secondary">{t}</Typography>
-                    <Chip label={r} size="small" variant="outlined" sx={{ fontSize: '0.65rem', fontWeight: 700 }} />
-                  </Stack>
-                ))}
-              </Stack>
-            </Card>
-
-            <Paper variant="outlined" sx={{ p: 3, bgcolor: 'success.main', color: 'white', border: 'none' }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 0.5 }}>Privacy First</Typography>
-              <Typography variant="caption" sx={{ lineHeight: 1.7 }}>
-                All image processing happens on your device. We never receive or store your images.
-              </Typography>
+              </form>
             </Paper>
-
-            <Divider />
-            <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>GitHub Issues</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                For bugs and feature requests you can also open an issue on the project repository using the Bug Report or Feature Request templates.
-              </Typography>
-            </Box>
-          </Stack>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+
+        {/* Additional Info Section */}
+        <Box sx={{ mt: 8, textAlign: 'center' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
+            About Zest Tech Solution
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 800, mx: 'auto', mb: 2 }}>
+            Founded by <strong>Naushad Alam</strong>, Zest Tech Solution is dedicated to creating innovative web solutions
+            that empower developers and users alike. Squoosh Next is our flagship image compression tool, built with
+            cutting-edge technology to provide the best client-side compression experience.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            We believe in privacy-first solutions that respect user data while delivering exceptional performance.
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
   );
 }
