@@ -6,6 +6,7 @@ import Footer from 'components/Footer';
 import FloatingDashboard from 'components/FloatingDashboard';
 import { Box } from '@mui/material';
 import Script from 'next/script';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 
 export const metadata = {
@@ -101,6 +102,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </Box>
           </ThemeRegistry>
         </AppRouterCacheProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
