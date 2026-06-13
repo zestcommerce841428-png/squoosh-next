@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Empty turbopack config to silence the warning (most apps work without special config)
+  turbopack: {},
   // Allow dynamic import() of codec JS glue files from public/codecs/
   // without Webpack trying to bundle them.
   webpack(config, { isServer }) {
