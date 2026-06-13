@@ -1,0 +1,250 @@
+{
+  "_meta": {
+    "language": "Danish",
+    "nativeName": "Dansk",
+    "code": "da-DK",
+    "translationStatus": "machine_translated",
+    "note": "This is a machine-generated translation. Professional translation recommended for production use."
+  },
+  "common": {
+    "appName": "Squoosh Next",
+    "tagline": "Premium Image Compressor",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "copy": "Copy",
+    "download": "Download",
+    "upload": "Upload",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "select": "Select",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "compress": "Compress",
+    "batchCompress": "Batch Compress",
+    "tools": "Tools",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy"
+  },
+  "home": {
+    "title": "Professional Image Compression",
+    "subtitle": "Compress, resize, and convert images instantly with zero server uploads. Fast, secure, and privacy-focused.",
+    "cta": "Start Compressing",
+    "learnMore": "Learn More",
+    "stats": {
+      "users": "Active Users",
+      "compressed": "Images Compressed",
+      "saved": "Storage Saved"
+    },
+    "features": {
+      "title": "Why Choose Squoosh Next?",
+      "subtitle": "Professional-grade compression with privacy at its core",
+      "items": {
+        "clientSide": {
+          "title": "Client-Side Processing",
+          "description": "All compression happens in your browser. Your images never leave your device."
+        },
+        "multiFormat": {
+          "title": "Multiple Formats",
+          "description": "Support for JPEG, PNG, WebP, AVIF, JPEG XL, and 70+ more formats."
+        },
+        "batch": {
+          "title": "Batch Processing",
+          "description": "Compress multiple images simultaneously with advanced queue management."
+        },
+        "quality": {
+          "title": "Quality Control",
+          "description": "Fine-tune compression with real-time preview and side-by-side comparison."
+        },
+        "metadata": {
+          "title": "EXIF Metadata",
+          "description": "Preserve or strip image metadata including GPS, camera info, and more."
+        },
+        "wasm": {
+          "title": "WebAssembly Powered",
+          "description": "Lightning-fast compression using cutting-edge WebAssembly technology."
+        }
+      }
+    }
+  },
+  "compression": {
+    "title": "Image Compression",
+    "dropZone": "Drop images here or click to browse",
+    "selectImage": "Select Image",
+    "processing": "Processing...",
+    "compressing": "Compressing...",
+    "quality": "Quality",
+    "format": "Output Format",
+    "originalSize": "Original Size",
+    "compressedSize": "Compressed Size",
+    "saved": "Saved",
+    "ratio": "Compression Ratio",
+    "preview": "Preview",
+    "compare": "Compare",
+    "before": "Before",
+    "after": "After",
+    "downloadImage": "Download Compressed Image",
+    "downloadAll": "Download All",
+    "clearAll": "Clear All",
+    "addMore": "Add More Images",
+    "settings": {
+      "title": "Compression Settings",
+      "quality": "Quality Level",
+      "format": "Output Format",
+      "resize": "Resize",
+      "width": "Width",
+      "height": "Height",
+      "maintainAspectRatio": "Maintain Aspect Ratio",
+      "metadata": "EXIF Metadata",
+      "keepMetadata": "Keep Metadata",
+      "stripMetadata": "Strip Metadata",
+      "advanced": "Advanced Options"
+    }
+  },
+  "formats": {
+    "jpeg": "JPEG",
+    "png": "PNG",
+    "webp": "WebP",
+    "avif": "AVIF",
+    "jpegxl": "JPEG XL",
+    "gif": "GIF",
+    "svg": "SVG",
+    "bmp": "BMP",
+    "tiff": "TIFF",
+    "heic": "HEIC",
+    "pdf": "PDF"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Have questions about Squoosh Next? Need support or want to collaborate? We'd love to hear from you!",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "company": "Company / Organization",
+      "category": "Inquiry Category",
+      "subject": "Subject",
+      "message": "Message",
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "required": "Required field",
+      "optional": "Optional",
+      "validation": {
+        "nameMinLength": "Name must be at least 2 characters long",
+        "nameInvalid": "Name can only contain letters and spaces",
+        "emailInvalid": "Please enter a valid email address",
+        "phoneInvalid": "Please enter a valid phone number",
+        "subjectMinLength": "Subject must be at least 5 characters long",
+        "messageMinLength": "Message must be at least 20 characters long",
+        "messageMaxLength": "Message must not exceed 2000 characters"
+      },
+      "categories": {
+        "general": "General Inquiry",
+        "support": "Technical Support",
+        "feature": "Feature Request",
+        "bug": "Bug Report",
+        "partnership": "Partnership",
+        "business": "Business Proposal",
+        "media": "Media & Press",
+        "other": "Other"
+      },
+      "success": {
+        "title": "Thank you for contacting us!",
+        "message": "We'll get back to you within 24 hours. Check your email for confirmation."
+      },
+      "error": {
+        "title": "Failed to send message",
+        "message": "Please try again or contact us directly at contact@zestcommerce.in"
+      },
+      "privacy": "This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply. By submitting this form, you agree to our Privacy Policy."
+    },
+    "info": {
+      "email": {
+        "title": "Email Us",
+        "description": "For general inquiries and support",
+        "value": "contact@zestcommerce.in"
+      },
+      "phone": {
+        "title": "Call Us",
+        "description": "Available Mon-Fri, 9AM-6PM IST",
+        "value": "+91 74920 68998"
+      },
+      "location": {
+        "title": "Visit Us",
+        "company": "Zest Tech Solution",
+        "country": "India"
+      }
+    },
+    "badges": {
+      "response": "24/7 Response",
+      "secure": "100% Secure",
+      "gdpr": "GDPR Compliant"
+    },
+    "about": {
+      "title": "About Zest Tech Solution",
+      "description": "Founded by Naushad Alam, Zest Tech Solution is dedicated to creating innovative web solutions that empower developers and users alike. Squoosh Next is our flagship image compression tool, built with cutting-edge technology to provide the best client-side compression experience.",
+      "mission": "We believe in privacy-first solutions that respect user data while delivering exceptional performance."
+    }
+  },
+  "batch": {
+    "title": "Batch Compression",
+    "subtitle": "Compress multiple images at once with advanced queue management",
+    "addFiles": "Add Files",
+    "addFolder": "Add Folder",
+    "processing": "Processing {current} of {total}",
+    "completed": "Completed {count} images",
+    "queue": "Queue",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  },
+  "footer": {
+    "tagline": "Privacy-first image compression",
+    "copyright": "© 2026 Zest Tech Solution. All rights reserved.",
+    "madeBy": "Made with ❤️ by Naushad Alam",
+    "links": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "social": "Social"
+    }
+  },
+  "errors": {
+    "fileTooBig": "File size exceeds maximum limit of {size}MB",
+    "unsupportedFormat": "Unsupported file format: {format}",
+    "uploadFailed": "Failed to upload file",
+    "compressionFailed": "Compression failed. Please try again.",
+    "networkError": "Network error. Please check your connection.",
+    "unknown": "An unexpected error occurred"
+  },
+  "notifications": {
+    "compressionComplete": "Compression completed successfully!",
+    "downloadStarted": "Download started",
+    "copiedToClipboard": "Copied to clipboard",
+    "settingsSaved": "Settings saved successfully"
+  }
+}

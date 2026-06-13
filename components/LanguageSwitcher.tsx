@@ -12,6 +12,7 @@ import {
   Divider,
   Chip,
 } from '@mui/material';
+import { useLanguage } from '../lib/i18n';
 
 // Language/Country Configuration
 interface Language {

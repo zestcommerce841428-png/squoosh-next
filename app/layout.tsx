@@ -6,6 +6,7 @@ import Footer from 'components/Footer';
 import FloatingDashboard from 'components/FloatingDashboard';
 import { Box } from '@mui/material';
 import Script from 'next/script';
+import { LanguageProvider } from '../lib/i18n';
 import './globals.css';
 
 // Environment variable for Google Analytics
@@ -187,14 +188,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         <AppRouterCacheProvider options={{ key: 'css', enableCssLayer: true }}>
           <ThemeRegistry>
-            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
-              <Header />
-              <Box component="main" sx={{ flexGrow: 1 }}>
-                {children}
+            <LanguageProvider>
+              <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+                <Header />
+                <Box component="main" sx={{ flexGrow: 1 }}>
+                  {children}
+                </Box>
+                <Footer />
+                <FloatingDashboard />
               </Box>
-              <Footer />
-              <FloatingDashboard />
-            </Box>
+            </LanguageProvider>
           </ThemeRegistry>
         </AppRouterCacheProvider>
       </body>

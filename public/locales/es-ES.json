@@ -1,0 +1,243 @@
+{
+  "common": {
+    "appName": "Squoosh Next",
+    "tagline": "Compresor de Imágenes Premium",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "copy": "Copiar",
+    "download": "Descargar",
+    "upload": "Subir",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "reset": "Restablecer",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "select": "Seleccionar",
+    "selectAll": "Seleccionar todo",
+    "deselectAll": "Deseleccionar todo",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Inicio",
+    "features": "Características",
+    "compress": "Comprimir",
+    "batchCompress": "Compresión por lotes",
+    "tools": "Herramientas",
+    "blog": "Blog",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "privacy": "Política de privacidad",
+    "terms": "Términos de servicio",
+    "cookies": "Política de cookies"
+  },
+  "home": {
+    "title": "Compresión de Imágenes Profesional",
+    "subtitle": "Comprime, redimensiona y convierte imágenes instantáneamente sin cargas al servidor. Rápido, seguro y enfocado en la privacidad.",
+    "cta": "Comenzar a Comprimir",
+    "learnMore": "Saber más",
+    "stats": {
+      "users": "Usuarios Activos",
+      "compressed": "Imágenes Comprimidas",
+      "saved": "Almacenamiento Ahorrado"
+    },
+    "features": {
+      "title": "¿Por qué elegir Squoosh Next?",
+      "subtitle": "Compresión de grado profesional con privacidad en su núcleo",
+      "items": {
+        "clientSide": {
+          "title": "Procesamiento del Lado del Cliente",
+          "description": "Toda la compresión ocurre en tu navegador. Tus imágenes nunca salen de tu dispositivo."
+        },
+        "multiFormat": {
+          "title": "Múltiples Formatos",
+          "description": "Soporte para JPEG, PNG, WebP, AVIF, JPEG XL y más de 70 formatos."
+        },
+        "batch": {
+          "title": "Procesamiento por Lotes",
+          "description": "Comprime múltiples imágenes simultáneamente con gestión avanzada de colas."
+        },
+        "quality": {
+          "title": "Control de Calidad",
+          "description": "Ajusta la compresión con vista previa en tiempo real y comparación lado a lado."
+        },
+        "metadata": {
+          "title": "Metadatos EXIF",
+          "description": "Preserva o elimina metadatos de imagen incluyendo GPS, información de cámara y más."
+        },
+        "wasm": {
+          "title": "Impulsado por WebAssembly",
+          "description": "Compresión ultrarrápida usando tecnología WebAssembly de vanguardia."
+        }
+      }
+    }
+  },
+  "compression": {
+    "title": "Compresión de Imágenes",
+    "dropZone": "Suelta imágenes aquí o haz clic para explorar",
+    "selectImage": "Seleccionar Imagen",
+    "processing": "Procesando...",
+    "compressing": "Comprimiendo...",
+    "quality": "Calidad",
+    "format": "Formato de Salida",
+    "originalSize": "Tamaño Original",
+    "compressedSize": "Tamaño Comprimido",
+    "saved": "Ahorrado",
+    "ratio": "Relación de Compresión",
+    "preview": "Vista Previa",
+    "compare": "Comparar",
+    "before": "Antes",
+    "after": "Después",
+    "downloadImage": "Descargar Imagen Comprimida",
+    "downloadAll": "Descargar Todo",
+    "clearAll": "Limpiar Todo",
+    "addMore": "Agregar Más Imágenes",
+    "settings": {
+      "title": "Configuración de Compresión",
+      "quality": "Nivel de Calidad",
+      "format": "Formato de Salida",
+      "resize": "Redimensionar",
+      "width": "Ancho",
+      "height": "Alto",
+      "maintainAspectRatio": "Mantener Relación de Aspecto",
+      "metadata": "Metadatos EXIF",
+      "keepMetadata": "Mantener Metadatos",
+      "stripMetadata": "Eliminar Metadatos",
+      "advanced": "Opciones Avanzadas"
+    }
+  },
+  "formats": {
+    "jpeg": "JPEG",
+    "png": "PNG",
+    "webp": "WebP",
+    "avif": "AVIF",
+    "jpegxl": "JPEG XL",
+    "gif": "GIF",
+    "svg": "SVG",
+    "bmp": "BMP",
+    "tiff": "TIFF",
+    "heic": "HEIC",
+    "pdf": "PDF"
+  },
+  "contact": {
+    "title": "Ponte en Contacto",
+    "subtitle": "¿Tienes preguntas sobre Squoosh Next? ¿Necesitas soporte o quieres colaborar? ¡Nos encantaría saber de ti!",
+    "form": {
+      "name": "Nombre Completo",
+      "email": "Correo Electrónico",
+      "phone": "Número de Teléfono",
+      "company": "Empresa / Organización",
+      "category": "Categoría de Consulta",
+      "subject": "Asunto",
+      "message": "Mensaje",
+      "submit": "Enviar Mensaje",
+      "sending": "Enviando...",
+      "required": "Campo requerido",
+      "optional": "Opcional",
+      "validation": {
+        "nameMinLength": "El nombre debe tener al menos 2 caracteres",
+        "nameInvalid": "El nombre solo puede contener letras y espacios",
+        "emailInvalid": "Por favor ingresa un correo electrónico válido",
+        "phoneInvalid": "Por favor ingresa un número de teléfono válido",
+        "subjectMinLength": "El asunto debe tener al menos 5 caracteres",
+        "messageMinLength": "El mensaje debe tener al menos 20 caracteres",
+        "messageMaxLength": "El mensaje no debe exceder los 2000 caracteres"
+      },
+      "categories": {
+        "general": "Consulta General",
+        "support": "Soporte Técnico",
+        "feature": "Solicitud de Función",
+        "bug": "Reporte de Error",
+        "partnership": "Asociación",
+        "business": "Propuesta de Negocio",
+        "media": "Medios y Prensa",
+        "other": "Otro"
+      },
+      "success": {
+        "title": "¡Gracias por contactarnos!",
+        "message": "Te responderemos dentro de las 24 horas. Revisa tu correo electrónico para confirmación."
+      },
+      "error": {
+        "title": "Error al enviar el mensaje",
+        "message": "Por favor intenta de nuevo o contáctanos directamente en contact@zestcommerce.in"
+      },
+      "privacy": "Este sitio está protegido por reCAPTCHA y se aplican la Política de Privacidad y los Términos de Servicio de Google. Al enviar este formulario, aceptas nuestra Política de Privacidad."
+    },
+    "info": {
+      "email": {
+        "title": "Envíanos un Correo",
+        "description": "Para consultas generales y soporte",
+        "value": "contact@zestcommerce.in"
+      },
+      "phone": {
+        "title": "Llámanos",
+        "description": "Disponible Lun-Vie, 9AM-6PM IST",
+        "value": "+91 74920 68998"
+      },
+      "location": {
+        "title": "Visítanos",
+        "company": "Zest Tech Solution",
+        "country": "India"
+      }
+    },
+    "badges": {
+      "response": "Respuesta 24/7",
+      "secure": "100% Seguro",
+      "gdpr": "Cumple con GDPR"
+    },
+    "about": {
+      "title": "Acerca de Zest Tech Solution",
+      "description": "Fundada por Naushad Alam, Zest Tech Solution se dedica a crear soluciones web innovadoras que empoderan a desarrolladores y usuarios por igual. Squoosh Next es nuestra herramienta insignia de compresión de imágenes, construida con tecnología de vanguardia para proporcionar la mejor experiencia de compresión del lado del cliente.",
+      "mission": "Creemos en soluciones que priorizan la privacidad y respetan los datos del usuario mientras ofrecen un rendimiento excepcional."
+    }
+  },
+  "batch": {
+    "title": "Compresión por Lotes",
+    "subtitle": "Comprime múltiples imágenes a la vez con gestión avanzada de colas",
+    "addFiles": "Agregar Archivos",
+    "addFolder": "Agregar Carpeta",
+    "processing": "Procesando {current} de {total}",
+    "completed": "Completadas {count} imágenes",
+    "queue": "Cola",
+    "status": {
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "completed": "Completado",
+      "failed": "Fallido"
+    }
+  },
+  "footer": {
+    "tagline": "Compresión de imágenes con privacidad primero",
+    "copyright": "© 2026 Zest Tech Solution. Todos los derechos reservados.",
+    "madeBy": "Hecho con ❤️ por Naushad Alam",
+    "links": {
+      "product": "Producto",
+      "company": "Empresa",
+      "legal": "Legal",
+      "social": "Social"
+    }
+  },
+  "errors": {
+    "fileTooBig": "El tamaño del archivo excede el límite máximo de {size}MB",
+    "unsupportedFormat": "Formato de archivo no soportado: {format}",
+    "uploadFailed": "Error al subir el archivo",
+    "compressionFailed": "La compresión falló. Por favor intenta de nuevo.",
+    "networkError": "Error de red. Por favor verifica tu conexión.",
+    "unknown": "Ocurrió un error inesperado"
+  },
+  "notifications": {
+    "compressionComplete": "¡Compresión completada exitosamente!",
+    "downloadStarted": "Descarga iniciada",
+    "copiedToClipboard": "Copiado al portapapeles",
+    "settingsSaved": "Configuración guardada exitosamente"
+  }
+}

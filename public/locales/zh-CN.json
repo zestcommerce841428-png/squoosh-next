@@ -1,0 +1,243 @@
+{
+  "common": {
+    "appName": "Squoosh Next",
+    "tagline": "专业图像压缩工具",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "close": "关闭",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "copy": "复制",
+    "download": "下载",
+    "upload": "上传",
+    "next": "下一步",
+    "previous": "上一步",
+    "submit": "提交",
+    "reset": "重置",
+    "search": "搜索",
+    "filter": "过滤",
+    "sort": "排序",
+    "select": "选择",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "confirm": "确认",
+    "yes": "是",
+    "no": "否"
+  },
+  "nav": {
+    "home": "首页",
+    "features": "功能",
+    "compress": "压缩",
+    "batchCompress": "批量压缩",
+    "tools": "工具",
+    "blog": "博客",
+    "about": "关于",
+    "contact": "联系我们",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "cookies": "Cookie 政策"
+  },
+  "home": {
+    "title": "专业图像压缩",
+    "subtitle": "即时压缩、调整大小和转换图像，零服务器上传。快速、安全且注重隐私。",
+    "cta": "开始压缩",
+    "learnMore": "了解更多",
+    "stats": {
+      "users": "活跃用户",
+      "compressed": "已压缩图像",
+      "saved": "节省存储空间"
+    },
+    "features": {
+      "title": "为什么选择 Squoosh Next？",
+      "subtitle": "专业级压缩，隐私至上",
+      "items": {
+        "clientSide": {
+          "title": "客户端处理",
+          "description": "所有压缩都在您的浏览器中进行。您的图像永远不会离开您的设备。"
+        },
+        "multiFormat": {
+          "title": "多种格式",
+          "description": "支持 JPEG、PNG、WebP、AVIF、JPEG XL 及 70 多种格式。"
+        },
+        "batch": {
+          "title": "批量处理",
+          "description": "使用高级队列管理同时压缩多个图像。"
+        },
+        "quality": {
+          "title": "质量控制",
+          "description": "通过实时预览和并排比较微调压缩。"
+        },
+        "metadata": {
+          "title": "EXIF 元数据",
+          "description": "保留或删除图像元数据，包括 GPS、相机信息等。"
+        },
+        "wasm": {
+          "title": "WebAssembly 驱动",
+          "description": "使用尖端 WebAssembly 技术实现闪电般的压缩速度。"
+        }
+      }
+    }
+  },
+  "compression": {
+    "title": "图像压缩",
+    "dropZone": "将图像拖放到此处或点击浏览",
+    "selectImage": "选择图像",
+    "processing": "处理中...",
+    "compressing": "压缩中...",
+    "quality": "质量",
+    "format": "输出格式",
+    "originalSize": "原始大小",
+    "compressedSize": "压缩后大小",
+    "saved": "节省",
+    "ratio": "压缩比",
+    "preview": "预览",
+    "compare": "比较",
+    "before": "之前",
+    "after": "之后",
+    "downloadImage": "下载压缩图像",
+    "downloadAll": "全部下载",
+    "clearAll": "全部清除",
+    "addMore": "添加更多图像",
+    "settings": {
+      "title": "压缩设置",
+      "quality": "质量级别",
+      "format": "输出格式",
+      "resize": "调整大小",
+      "width": "宽度",
+      "height": "高度",
+      "maintainAspectRatio": "保持纵横比",
+      "metadata": "EXIF 元数据",
+      "keepMetadata": "保留元数据",
+      "stripMetadata": "删除元数据",
+      "advanced": "高级选项"
+    }
+  },
+  "formats": {
+    "jpeg": "JPEG",
+    "png": "PNG",
+    "webp": "WebP",
+    "avif": "AVIF",
+    "jpegxl": "JPEG XL",
+    "gif": "GIF",
+    "svg": "SVG",
+    "bmp": "BMP",
+    "tiff": "TIFF",
+    "heic": "HEIC",
+    "pdf": "PDF"
+  },
+  "contact": {
+    "title": "联系我们",
+    "subtitle": "对 Squoosh Next 有疑问？需要支持或想要合作？我们很乐意听到您的声音！",
+    "form": {
+      "name": "全名",
+      "email": "电子邮件地址",
+      "phone": "电话号码",
+      "company": "公司/组织",
+      "category": "查询类别",
+      "subject": "主题",
+      "message": "消息",
+      "submit": "发送消息",
+      "sending": "发送中...",
+      "required": "必填字段",
+      "optional": "可选",
+      "validation": {
+        "nameMinLength": "姓名至少需要 2 个字符",
+        "nameInvalid": "姓名只能包含字母和空格",
+        "emailInvalid": "请输入有效的电子邮件地址",
+        "phoneInvalid": "请输入有效的电话号码",
+        "subjectMinLength": "主题至少需要 5 个字符",
+        "messageMinLength": "消息至少需要 20 个字符",
+        "messageMaxLength": "消息不得超过 2000 个字符"
+      },
+      "categories": {
+        "general": "一般查询",
+        "support": "技术支持",
+        "feature": "功能请求",
+        "bug": "错误报告",
+        "partnership": "合作伙伴关系",
+        "business": "商业提案",
+        "media": "媒体和新闻",
+        "other": "其他"
+      },
+      "success": {
+        "title": "感谢您联系我们！",
+        "message": "我们将在 24 小时内回复您。请查看您的电子邮件以获取确认。"
+      },
+      "error": {
+        "title": "发送消息失败",
+        "message": "请重试或直接联系我们：contact@zestcommerce.in"
+      },
+      "privacy": "此站点受 reCAPTCHA 和 Google 隐私政策及服务条款保护。提交此表单即表示您同意我们的隐私政策。"
+    },
+    "info": {
+      "email": {
+        "title": "发送电子邮件",
+        "description": "一般查询和支持",
+        "value": "contact@zestcommerce.in"
+      },
+      "phone": {
+        "title": "致电我们",
+        "description": "周一至周五，上午 9 点至下午 6 点（印度标准时间）",
+        "value": "+91 74920 68998"
+      },
+      "location": {
+        "title": "访问我们",
+        "company": "Zest Tech Solution",
+        "country": "印度"
+      }
+    },
+    "badges": {
+      "response": "全天候响应",
+      "secure": "100% 安全",
+      "gdpr": "符合 GDPR"
+    },
+    "about": {
+      "title": "关于 Zest Tech Solution",
+      "description": "由 Naushad Alam 创立，Zest Tech Solution 致力于创建创新的网络解决方案，为开发人员和用户赋能。Squoosh Next 是我们的旗舰图像压缩工具，采用尖端技术构建，提供最佳的客户端压缩体验。",
+      "mission": "我们相信隐私优先的解决方案，在提供卓越性能的同时尊重用户数据。"
+    }
+  },
+  "batch": {
+    "title": "批量压缩",
+    "subtitle": "使用高级队列管理一次压缩多个图像",
+    "addFiles": "添加文件",
+    "addFolder": "添加文件夹",
+    "processing": "正在处理 {current}/{total}",
+    "completed": "已完成 {count} 张图像",
+    "queue": "队列",
+    "status": {
+      "pending": "待处理",
+      "processing": "处理中",
+      "completed": "已完成",
+      "failed": "失败"
+    }
+  },
+  "footer": {
+    "tagline": "隐私优先的图像压缩",
+    "copyright": "© 2026 Zest Tech Solution。保留所有权利。",
+    "madeBy": "由 Naushad Alam 用 ❤️ 制作",
+    "links": {
+      "product": "产品",
+      "company": "公司",
+      "legal": "法律",
+      "social": "社交"
+    }
+  },
+  "errors": {
+    "fileTooBig": "文件大小超过最大限制 {size}MB",
+    "unsupportedFormat": "不支持的文件格式：{format}",
+    "uploadFailed": "文件上传失败",
+    "compressionFailed": "压缩失败。请重试。",
+    "networkError": "网络错误。请检查您的连接。",
+    "unknown": "发生意外错误"
+  },
+  "notifications": {
+    "compressionComplete": "压缩成功完成！",
+    "downloadStarted": "下载已开始",
+    "copiedToClipboard": "已复制到剪贴板",
+    "settingsSaved": "设置已成功保存"
+  }
+}
