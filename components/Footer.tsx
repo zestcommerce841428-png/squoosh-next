@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Container, Grid, Typography, Stack, Box, Divider } from '@mui/material';
+import BuildStatus from './BuildStatus';
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <Box component={Link} href={href} sx={{ textDecoration: 'none', color: 'inherit' }}>
@@ -99,6 +100,9 @@ export default function Footer() {
           </Stack>
         </Box>
       </Container>
+      
+      {/* Real-time Build Status */}
+      <BuildStatus />
     </Box>
   );
 }
