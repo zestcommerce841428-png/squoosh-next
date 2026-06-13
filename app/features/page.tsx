@@ -16,7 +16,7 @@ import {
   Divider,
 } from '@mui/material';
 import Link from 'next/link';
-import { FEATURES_DATA, CATEGORIES } from './features-data';
+import { FEATURES_DATA, CATEGORIES, getLiveToolsCount, getComingSoonCount } from './features-data';
 
 // Icon definitions
 const SearchIcon = () => (
@@ -68,15 +68,16 @@ export default function FeaturesPage() {
       {/* Title Header */}
       <Box sx={{ mb: 6, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 800, mb: 2, background: 'linear-gradient(90deg, #3b82f6 0%, #a855f7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          Advanced Image Toolkit Catalog
+          Professional Image Tools Suite
         </Typography>
         <Typography variant="subtitle1" color="text.secondary" sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
-          Discover the complete suite of 230+ professional tools engineered for high-performance optimization, format conversion, editing adjustments, AI enrichment, and SEO analytics.
+          31 fully functional tools are live now with 199+ advanced features coming soon. All tools run 100% in your browser for complete privacy and security.
         </Typography>
         <Stack direction="row" spacing={1.5} justifyContent="center" flexWrap="wrap">
-          <Chip label="230 Enterprise Features" color="primary" sx={{ fontWeight: 700 }} />
-          <Chip label="12 Professional Categories" variant="outlined" sx={{ fontWeight: 600 }} />
-          <Chip label="100% Client-Side & Secure" variant="outlined" color="success" sx={{ fontWeight: 600 }} />
+          <Chip label="✅ 31 Tools Live Now" color="success" sx={{ fontWeight: 700 }} />
+          <Chip label="🚀 199+ Coming Soon" variant="outlined" color="primary" sx={{ fontWeight: 600 }} />
+          <Chip label="🔒 100% Client-Side & Secure" variant="outlined" color="success" sx={{ fontWeight: 600 }} />
+          <Chip label="💯 No Demo - All Functional" variant="outlined" color="info" sx={{ fontWeight: 600 }} />
         </Stack>
       </Box>
 
@@ -156,9 +157,15 @@ export default function FeaturesPage() {
                 </Typography>
               </Box>
               <Box sx={{ pt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button component={Link} href={`/tools/${getSlug(feature.name)}`} variant="text" size="small" sx={{ fontWeight: 700 }}>
-                  Use Tool &rarr;
-                </Button>
+                {feature.status === 'live' && feature.slug ? (
+                  <Button component={Link} href={`/tools/${feature.slug}`} variant="contained" size="small" sx={{ fontWeight: 700 }}>
+                    Use Tool Now &rarr;
+                  </Button>
+                ) : (
+                  <Button variant="outlined" size="small" disabled sx={{ fontWeight: 700 }}>
+                    Coming Soon
+                  </Button>
+                )}
               </Box>
             </Card>
           </Grid>
