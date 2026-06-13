@@ -172,7 +172,7 @@ interface RenderParams {
   // polaroid
   pText: string; pSepia: number; pNoise: number; pVignette: number;
   // background
-  bgColor: string;
+  bgColor: string; bgThreshold: number; bgFeather: number; bgTransparent: boolean;
   // icongen sizes: string
   iconSizes: string[];
   // collage
@@ -460,14 +460,25 @@ async function renderToCanvas(
   }
 
   if (archetype === 'background') {
-    // Rough chroma-key style: brightest near-white pixels → transparent/color
+    // Threshold-based background removal with edge feathering
     const bg = hexToRgb(params.bgColor);
+    const threshold = params.bgThreshold ?? 230; // 0-255, luminance cutoff
+    const feather = params.bgFeather ?? 10;       // px soft edge
+    const replaceTransparent = params.bgTransparent ?? false;
+
     for (let i = 0; i < d.length; i += 4) {
-      const r=d[i],g=d[i+1],b=d[i+2];
-      // Simple luminance threshold for near-white/near-black removal
-      const lum = 0.299*r+0.587*g+0.114*b;
-      if (lum > 230) { // near-white considered background
-        d[i]=bg.r; d[i+1]=bg.g; d[i+2]=bg.b; d[i+3]=255;
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      if (lum >= threshold) {
+        if (replaceTransparent) {
+          // Feathered alpha: smooth edge around threshold ± feather
+          const alpha = feather > 0
+            ? Math.max(0, Math.min(1, (lum - threshold) / feather))
+            : 1;
+          d[i + 3] = Math.round((1 - alpha) * d[i + 3]);
+        } else {
+          d[i] = bg.r; d[i + 1] = bg.g; d[i + 2] = bg.b; d[i + 3] = 255;
+        }
       }
     }
     ctx.putImageData(imgData, 0, 0);
@@ -482,18 +493,26 @@ async function renderToCanvas(
   if (archetype === 'meme') {
     ctx.drawImage(img, 0, 0);
     ctx.textAlign = 'center';
-    ctx.font = `bold ${params.memeFontSize}px Impact, sans-serif`;
-    ctx.strokeStyle = params.memeStroke; ctx.lineWidth = 6; ctx.fillStyle = params.memeTextColor;
-    if (params.memeTop) {
-      ctx.textBaseline = 'top';
-      ctx.strokeText(params.memeTop, W/2, 18, W-40);
-      ctx.fillText(params.memeTop, W/2, 18, W-40);
-    }
-    if (params.memeBottom) {
-      ctx.textBaseline = 'bottom';
-      ctx.strokeText(params.memeBottom, W/2, H-18, W-40);
-      ctx.fillText(params.memeBottom, W/2, H-18, W-40);
-    }
+    ctx.miterLimit = 2;
+    // Auto-size font to fill ~80% of canvas width if text is too long
+    const autoFontSize = (text: string, requestedSize: number): number => {
+      ctx.font = `bold ${requestedSize}px Impact, 'Arial Black', sans-serif`;
+      const measured = ctx.measureText(text).width;
+      if (measured > W * 0.88) return Math.floor(requestedSize * (W * 0.88) / measured);
+      return requestedSize;
+    };
+    const drawMemeText = (text: string, yPos: number, baseline: CanvasTextBaseline) => {
+      const fs = autoFontSize(text, params.memeFontSize);
+      ctx.font = `bold ${fs}px Impact, 'Arial Black', sans-serif`;
+      ctx.textBaseline = baseline;
+      ctx.lineWidth = Math.max(4, fs * 0.12);
+      ctx.strokeStyle = params.memeStroke;
+      ctx.fillStyle = params.memeTextColor;
+      ctx.strokeText(text.toUpperCase(), W / 2, yPos);
+      ctx.fillText(text.toUpperCase(), W / 2, yPos);
+    };
+    if (params.memeTop) drawMemeText(params.memeTop, Math.max(params.memeFontSize * 0.4, 12), 'top');
+    if (params.memeBottom) drawMemeText(params.memeBottom, H - Math.max(params.memeFontSize * 0.4, 12), 'bottom');
     return;
   }
 
@@ -654,6 +673,9 @@ export default function ToolRunnerPage({ params }: PageProps) {
   const [pNoise, setPNoise] = useState(15);
   const [pVignette, setPVignette] = useState(30);
   const [bgColor, setBgColor] = useState('#ffffff');
+  const [bgThreshold, setBgThreshold] = useState(230);
+  const [bgFeather, setBgFeather] = useState(10);
+  const [bgTransparent, setBgTransparent] = useState(false);
 
   // Derive export extension from format using global registry
   useEffect(() => {
@@ -671,9 +693,9 @@ export default function ToolRunnerPage({ params }: PageProps) {
     convertFmt, convertQuality, compQuality, compFmt,
     memeTop, memeBottom, memeFontSize, memeTextColor, memeStroke,
     bPadding, bRadius, bShadow, bGradient,
-    pText, pSepia, pNoise, pVignette, bgColor,
+    pText, pSepia, pNoise, pVignette, bgColor, bgThreshold, bgFeather, bgTransparent,
     iconSizes: ['16','32','64','128','256'], collageRows: 2, collageCols: 2, collageGap: 4, collageBg: '#000000',
-  }), [archetype, brightness, contrast, saturation, sepia, grayscale, gamma, convKernel, cinematicPreset, vigStrength, noiseAmt, resW, resH, cropL, cropR, cropT, cropB, rotation, flipH, flipV, wmText, wmColor, wmSize, wmOpacity, wmAlign, brdWidth, brdColor, brdRadius, pixSize, ditherType, channelMode, convertFmt, convertQuality, compQuality, compFmt, memeTop, memeBottom, memeFontSize, memeTextColor, memeStroke, bPadding, bRadius, bShadow, bGradient, pText, pSepia, pNoise, pVignette, bgColor, tool]);
+  }), [archetype, brightness, contrast, saturation, sepia, grayscale, gamma, convKernel, cinematicPreset, vigStrength, noiseAmt, resW, resH, cropL, cropR, cropT, cropB, rotation, flipH, flipV, wmText, wmColor, wmSize, wmOpacity, wmAlign, brdWidth, brdColor, brdRadius, pixSize, ditherType, channelMode, convertFmt, convertQuality, compQuality, compFmt, memeTop, memeBottom, memeFontSize, memeTextColor, memeStroke, bPadding, bRadius, bShadow, bGradient, pText, pSepia, pNoise, pVignette, bgColor, bgThreshold, bgFeather, bgTransparent, tool]);
 
   const renderPreview = useCallback(async () => {
     if (!originalUrl || !canvasRef.current) return;
@@ -1109,13 +1131,31 @@ export default function ToolRunnerPage({ params }: PageProps) {
       case 'background':
         return (
           <Stack spacing={2}>
-            <Alert severity="warning" sx={{ fontSize:'0.8rem' }}>Client-side near-white pixel removal. For production use, a dedicated AI background remover is recommended.</Alert>
-            <TextField fullWidth label="Replacement Color" size="small" value={bgColor} onChange={e=>setBgColor(e.target.value)} type="color" sx={{ '& input': { height:36 } }} />
-            <Stack direction="row" spacing={1} flexWrap="wrap">
-              {['#ffffff','#000000','#f1f5f9','#0f172a','transparent'].map(c=>(
-                <Button key={c} size="small" variant="outlined" onClick={()=>setBgColor(c === 'transparent' ? '#ffffff' : c)}>{c==='transparent'?'White':c}</Button>
-              ))}
-            </Stack>
+            <Alert severity="info" sx={{ fontSize:'0.8rem' }}>
+              Threshold-based background removal — removes near-white pixels. Adjust threshold to control sensitivity.
+            </Alert>
+            <FormControlLabel
+              control={<Switch checked={bgTransparent} onChange={e => setBgTransparent(e.target.checked)} size="small" />}
+              label="Output Transparent (PNG)"
+            />
+            {!bgTransparent && (
+              <>
+                <TextField fullWidth label="Replacement Color" size="small" value={bgColor} onChange={e=>setBgColor(e.target.value)} type="color" sx={{ '& input': { height:36 } }} />
+                <Stack direction="row" spacing={1} flexWrap="wrap">
+                  {['#ffffff','#000000','#f1f5f9','#0f172a'].map(c=>(
+                    <Button key={c} size="small" variant="outlined" onClick={()=>setBgColor(c)}>{c}</Button>
+                  ))}
+                </Stack>
+              </>
+            )}
+            <Typography variant="caption" gutterBottom>Luminance Threshold: {bgThreshold}</Typography>
+            <Slider value={bgThreshold} min={100} max={255} step={5} onChange={(_, v) => setBgThreshold(v as number)} size="small" />
+            {bgTransparent && (
+              <>
+                <Typography variant="caption" gutterBottom>Edge Feather: {bgFeather}px</Typography>
+                <Slider value={bgFeather} min={0} max={40} step={1} onChange={(_, v) => setBgFeather(v as number)} size="small" />
+              </>
+            )}
           </Stack>
         );
 

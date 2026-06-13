@@ -49,6 +49,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body suppressHydrationWarning>
+        {/* Service Worker Registration */}
+        <Script id="sw-register" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                .catch(() => {});
+            }
+          `}
+        </Script>
+
         {/* Google Analytics Integration */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"

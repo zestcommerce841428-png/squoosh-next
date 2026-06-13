@@ -121,12 +121,17 @@ interface HistoryItem {
 import {
   ACCEPT_STRING,
   ALL_EXPORT_FORMATS,
+  ALL_INPUT_EXTENSIONS,
   NATIVE_CODEC_FORMATS,
   CUSTOM_ENCODER_FORMATS,
   EXT_BY_VALUE,
   hasQualityControl,
   isLosslessFormat,
 } from '../constants/imageFormats';
+import { encodeImage } from '../lib/codecs';
+import { detectFormat } from '../lib/magicBytes';
+import { readExif, exifToRows } from '../lib/exif';
+import { addHistoryRecord, getHistoryRecords, clearHistory, generateThumbnail, type HistoryRecord } from '../lib/imageDB';
 
 const formats = NATIVE_CODEC_FORMATS.map(f => ({ label: f.label.split(' — ')[0], value: f.value }));
 
@@ -569,8 +574,14 @@ export default function ImageCompressor() {
   const [activeTab, setActiveTab] = useState<number>(0); // 0: Single, 1: Batch, 2: 100+ Catalog
   const [mounted, setMounted] = useState(false);
 
-  // Session History Log State
+  // Session History Log State (backed by IndexedDB)
   const [sessionHistory, setSessionHistory] = useState<HistoryItem[]>([]);
+
+  // EXIF state — populated by readExif() on file load
+  const [exifRows, setExifRows] = useState<Array<{ label: string; value: string }>>([]);
+
+  // Detected format state — populated by magic-byte detection on file load
+  const [detectedFormat, setDetectedFormat] = useState<string>('');
 
   // EXIF Metadata Editor states
   const [metaAuthor, setMetaAuthor] = useState<string>('');
@@ -619,7 +630,37 @@ export default function ImageCompressor() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Global paste handler — Ctrl+V pastes image from clipboard
+    const onPaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          const blob = items[i].getAsFile();
+          if (blob) handleFile(blob);
+          break;
+        }
+      }
+    };
+    window.addEventListener('paste', onPaste);
+
+    // Load persisted history from IndexedDB
+    getHistoryRecords(20).then((records) => {
+      setSessionHistory(records.map((r) => ({
+        id: String(r.id ?? Math.random()),
+        name: r.filename,
+        originalSize: r.originalSize,
+        compressedSize: r.compressedSize,
+        savings: r.savings,
+        format: r.codec,
+        timestamp: new Date(r.timestamp).toLocaleTimeString(),
+      })));
+    }).catch(() => {/* IndexedDB may not be available in all envs */});
+
+    return () => {
+      window.removeEventListener('paste', onPaste);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Single mode states
   const [file, setFile] = useState<File | null>(null);
@@ -733,6 +774,25 @@ export default function ImageCompressor() {
     const extension = file.name.split('.').pop()?.toLowerCase() || '';
     const formatLabel = extension.toUpperCase();
     setFileFormatName(formatLabel);
+    setExifRows([]);
+    setDetectedFormat('');
+
+    // Magic-byte format detection
+    detectFormat(file).then((det) => {
+      setDetectedFormat(`${det.label} (${det.confidence})`);
+      if (det.ext && det.ext !== extension) {
+        setFileFormatName(det.ext.toUpperCase());
+      }
+    }).catch(() => {});
+
+    // EXIF reading (JPEG only — silently no-ops for other formats)
+    readExif(file).then((exif) => {
+      const rows = exifToRows(exif);
+      if (rows.length > 0) setExifRows(rows);
+      if (exif.imageWidth && exif.imageHeight && !originalDimensions) {
+        setOriginalDimensions({ w: exif.imageWidth, h: exif.imageHeight });
+      }
+    }).catch(() => {});
 
     const isNative = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'svg', 'bmp', 'ico'].includes(extension);
     setIsExotic(!isNative);
@@ -881,7 +941,7 @@ export default function ImageCompressor() {
     if (!incomingFile) return;
     
     const extension = incomingFile.name.split('.').pop()?.toLowerCase() || '';
-    if (!ALL_EXTENSIONS.includes(extension) && !incomingFile.type.startsWith('image/')) {
+    if (!ALL_INPUT_EXTENSIONS.includes(extension) && !incomingFile.type.startsWith('image/')) {
       setError('Format not recognized. Supported: 100+ image types.');
       return;
     }
@@ -1389,13 +1449,27 @@ export default function ImageCompressor() {
       } else if (format.startsWith('alias/')) {
         blob = await new Promise<Blob | null>((res) => canvas.toBlob((b) => res(b), 'image/png'));
       } else {
-        blob = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob(
-            (result) => resolve(result),
-            format === 'image/wp2' ? 'image/webp' : format,
-            format === 'image/png' ? undefined : quality
-          )
-        );
+        // Use real WASM codecs for JPEG/WebP/AVIF/JXL/PNG; fallback for others
+        const realFormats = ['image/jpeg', 'image/webp', 'image/avif', 'image/jxl', 'image/png'];
+        const targetMime = format === 'image/wp2' ? 'image/webp' : format;
+        if (realFormats.includes(targetMime)) {
+          const result = await encodeImage(canvas, targetMime, {
+            quality: Math.round(quality * 100),
+            lossless: webpLossless || avifLossless || wp2Lossless,
+            speed: format === 'image/avif' ? avifEffort : format === 'image/png' ? pngLevel : undefined,
+            progressive: mozProgressive,
+            effort: format === 'image/png' ? pngLevel : undefined,
+          });
+          blob = new Blob([result.data], { type: result.mimeType });
+        } else {
+          blob = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob(
+              (result) => resolve(result),
+              targetMime,
+              format === 'image/png' ? undefined : quality
+            )
+          );
+        }
       }
 
       if (!blob) throw new Error('Compression failed.');
@@ -1405,9 +1479,24 @@ export default function ImageCompressor() {
       }
       setCompressedUrl(URL.createObjectURL(blob));
 
-      // Append successfully compressed items to history log
+      // Append to history — persist in IndexedDB
       const percentageSaved = ((1 - (blob.size / file.size)) * 100).toFixed(0);
       const outputFormatName = format.includes('/') ? format.split('/')[1].toUpperCase() : format.split('-')[0].toUpperCase();
+      const thumb = generateThumbnail(canvas);
+      const dbRecord: Omit<HistoryRecord, 'id'> = {
+        filename: file.name,
+        originalSize: file.size,
+        compressedSize: blob.size,
+        savings: `${percentageSaved}%`,
+        format: blob.type,
+        codec: outputFormatName,
+        quality: Math.round(quality * 100),
+        width: canvas.width,
+        height: canvas.height,
+        timestamp: Date.now(),
+        thumbnailDataUrl: thumb,
+      };
+      addHistoryRecord(dbRecord).catch(() => {});
       const newHistoryItem: HistoryItem = {
         id: Math.random().toString(36).substring(2, 9),
         name: file.name,
@@ -1417,7 +1506,7 @@ export default function ImageCompressor() {
         format: outputFormatName,
         timestamp: new Date().toLocaleTimeString(),
       };
-      setSessionHistory((prev) => [newHistoryItem, ...prev.filter(item => item.name !== file.name)].slice(0, 5));
+      setSessionHistory((prev) => [newHistoryItem, ...prev.filter(item => item.name !== file.name)].slice(0, 20));
       setBenchmarkTime(Math.round(performance.now() - startTime));
     } catch (exception) {
       setError((exception as Error).message || 'Compression error.');
@@ -1957,10 +2046,47 @@ export default function ImageCompressor() {
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 3, textAlign: 'center', maxWidth: 400 }}>
                       Supports 100+ formats: JPEG, PNG, WEBP, AVIF, HEIC, TIFF, PSD, Vector, and Camera RAW files.
                     </Typography>
-                    <Button variant="contained" component="label">
-                      Browse Files
-                      <input hidden accept={ACCEPT_STRING} type="file" onChange={(e) => handleFile(e.target.files?.[0])} />
-                    </Button>
+                    <Stack direction="row" spacing={1.5} flexWrap="wrap" justifyContent="center">
+                      <Button variant="contained" component="label">
+                        Browse Files
+                        <input hidden accept={ACCEPT_STRING} type="file" onChange={(e) => handleFile(e.target.files?.[0])} />
+                      </Button>
+                      <Button variant="outlined" onClick={async () => {
+                        try {
+                          const items = await navigator.clipboard.read();
+                          for (const item of items) {
+                            const imgType = item.types.find((t) => t.startsWith('image/'));
+                            if (imgType) {
+                              const blob = await item.getType(imgType);
+                              const f = new File([blob], `clipboard.${imgType.split('/')[1] || 'png'}`, { type: imgType });
+                              handleFile(f);
+                              return;
+                            }
+                          }
+                          setError('No image found in clipboard.');
+                        } catch {
+                          setError('Clipboard access denied. Use Ctrl+V or grant permission.');
+                        }
+                      }}>
+                        Paste (Ctrl+V)
+                      </Button>
+                      <Button variant="outlined" onClick={async () => {
+                        const url = prompt('Paste image URL:');
+                        if (!url) return;
+                        try {
+                          const res = await fetch(url);
+                          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                          const blob = await res.blob();
+                          const ext = url.split('?')[0].split('.').pop()?.toLowerCase() || 'jpg';
+                          const f = new File([blob], `url-import.${ext}`, { type: blob.type || 'image/jpeg' });
+                          handleFile(f);
+                        } catch (err) {
+                          setError(`Failed to fetch URL: ${(err as Error).message}`);
+                        }
+                      }}>
+                        From URL
+                      </Button>
+                    </Stack>
                   </Box>
                 )}
               </Paper>
@@ -2047,46 +2173,58 @@ export default function ImageCompressor() {
                         METADATA (EXIF) INSPECTOR
                       </Typography>
                       <Button size="small" variant="text" onClick={() => setShowRawExif(prev => !prev)}>
-                        {showRawExif ? 'Hide Raw' : 'Show Raw'}
+                        {showRawExif ? 'Table View' : 'Raw JSON'}
                       </Button>
                     </Box>
                     {showRawExif ? (
-                      <Box sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 1, maxHeight: 150, overflowY: 'auto' }}>
-                        <pre style={{ margin: 0, fontSize: '0.75rem', fontFamily: 'monospace' }}>
-                          {JSON.stringify({
+                      <Box sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 1, maxHeight: 200, overflowY: 'auto' }}>
+                        <pre style={{ margin: 0, fontSize: '0.72rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                          {JSON.stringify(
+                            Object.fromEntries(exifRows.map((r) => [r.label, r.value])),
+                            null, 2
+                          ) || JSON.stringify({
                             filename: file.name,
                             mimeType: file.type || 'image/unknown',
                             sizeBytes: file.size,
                             lastModifiedIso: new Date(file.lastModified).toISOString(),
-                            canvasWidth: originalDimensions?.w || 0,
-                            canvasHeight: originalDimensions?.h || 0,
-                            author: metaAuthor,
-                            description: metaDescription,
-                            copyright: metaCopyright,
-                            software: metaSoftware
+                            detectedFormat,
                           }, null, 2)}
                         </pre>
                       </Box>
                     ) : (
-                      <TableContainer component={Paper} variant="outlined">
-                        <Table size="small">
+                      <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 220, overflowY: 'auto' }}>
+                        <Table size="small" stickyHeader>
                           <TableBody>
                             <TableRow>
                               <TableCell sx={{ fontWeight: 600 }}><Typography variant="caption">MIME Type</Typography></TableCell>
                               <TableCell><Typography variant="caption">{file.type || 'image/unknown'}</Typography></TableCell>
                             </TableRow>
+                            {detectedFormat && (
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}><Typography variant="caption">Detected Format</Typography></TableCell>
+                                <TableCell><Typography variant="caption" color="success.main">{detectedFormat}</Typography></TableCell>
+                              </TableRow>
+                            )}
                             <TableRow>
                               <TableCell sx={{ fontWeight: 600 }}><Typography variant="caption">Last Modified</Typography></TableCell>
                               <TableCell><Typography variant="caption">{new Date(file.lastModified).toLocaleDateString()}</Typography></TableCell>
                             </TableRow>
+                            {exifRows.length > 0 ? exifRows.map((row, i) => (
+                              <TableRow key={i}>
+                                <TableCell sx={{ fontWeight: 600 }}><Typography variant="caption">{row.label}</Typography></TableCell>
+                                <TableCell><Typography variant="caption">{row.value}</Typography></TableCell>
+                              </TableRow>
+                            )) : (
+                              <TableRow>
+                                <TableCell colSpan={2}>
+                                  <Typography variant="caption" color="text.secondary">No EXIF data found (non-JPEG or stripped)</Typography>
+                                </TableCell>
+                              </TableRow>
+                            )}
                             <TableRow>
-                              <TableCell sx={{ fontWeight: 600 }}><Typography variant="caption">Color Space</Typography></TableCell>
-                              <TableCell><Typography variant="caption">sRGB (Estimated)</Typography></TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 600 }}><Typography variant="caption">EXIF Stripping</Typography></TableCell>
+                              <TableCell sx={{ fontWeight: 600 }}><Typography variant="caption">EXIF in Output</Typography></TableCell>
                               <TableCell>
-                                <Chip label="Auto-Strip" size="small" color="error" variant="outlined" sx={{ height: 16, fontSize: '0.65rem' }} />
+                                <Chip label="Stripped (canvas pipeline)" size="small" color="warning" variant="outlined" sx={{ height: 16, fontSize: '0.65rem' }} />
                               </TableCell>
                             </TableRow>
                           </TableBody>
