@@ -111,16 +111,16 @@ export const FEATURES_DATA: FeatureItem[] = [
   // Continue with remaining 189 features...
   // (I'll add key features from each category to reach 230 total)
 
-  // 3. AI Features (Advanced)
-  { id: 52, category: 'AI Features', name: 'AI Object Removal', description: 'Smart in-painting brush to clean up blemishes, dust, or unwanted objects.', badge: 'In-Browser AI', status: 'coming-soon' },
-  { id: 53, category: 'AI Features', name: 'AI Image Enhancement', description: 'Automatically adjust contrast, white balance, and exposure dynamically.', badge: 'Auto Balance', status: 'coming-soon' },
-  { id: 54, category: 'AI Features', name: 'AI Upscaler', description: 'Super-resolution network to double or quadruple image detail without blurriness.', badge: 'AI Super-Res', status: 'coming-soon' },
-  { id: 55, category: 'AI Features', name: 'AI Face Enhancement', description: 'Specialized details restoration for portraits and selfies.', badge: 'Portrait AI', status: 'coming-soon' },
-  { id: 56, category: 'AI Features', name: 'AI Noise Reduction', description: 'Denoise camera sensor grain while keeping edge definitions clean.', badge: 'Denoise', status: 'coming-soon' },
-  { id: 57, category: 'AI Features', name: 'AI Sharpening', description: 'Correct out-of-focus blurs using deconvolution-inspired neural filters.', badge: 'De-Blur', status: 'coming-soon' },
-  { id: 58, category: 'AI Features', name: 'AI Color Correction', description: 'Neural color matching to balance tones.', badge: 'Color Match', status: 'coming-soon' },
-  { id: 59, category: 'AI Features', name: 'AI Old Photo Restoration', description: 'Repair cracks, scratches, and fade damage from scanned historical images.', badge: 'Restorer', status: 'coming-soon' },
-  { id: 60, category: 'AI Features', name: 'AI Product Image Enhancement', description: 'Brighten, shadow-correct, and highlight commercial product shots.', badge: 'Ecom AI', status: 'coming-soon' },
+  // ===== DAYS 9-11: AI ENHANCEMENT SUITE (9 Tools) =====
+  { id: 53, category: 'AI Features', name: 'AI Object Removal', description: 'Smart in-painting brush to clean up blemishes, dust, or unwanted objects.', badge: '✅ LIVE', status: 'live', slug: 'ai-object-removal' },
+  { id: 54, category: 'AI Features', name: 'AI Image Enhancement', description: 'Automatically adjust contrast, white balance, and exposure dynamically.', badge: '✅ LIVE', status: 'live', slug: 'ai-image-enhancement' },
+  { id: 55, category: 'AI Features', name: 'AI Upscaler (2x/4x)', description: 'Super-resolution network to double or quadruple image detail without blurriness.', badge: '✅ LIVE', status: 'live', slug: 'ai-upscaler' },
+  { id: 56, category: 'AI Features', name: 'AI Face Enhancement', description: 'Specialized details restoration for portraits and selfies.', badge: '✅ LIVE', status: 'live', slug: 'ai-face-enhancement' },
+  { id: 57, category: 'AI Features', name: 'AI Noise Reduction', description: 'Denoise camera sensor grain while keeping edge definitions clean.', badge: '✅ LIVE', status: 'live', slug: 'ai-noise-reduction' },
+  { id: 58, category: 'AI Features', name: 'AI Sharpening', description: 'Correct out-of-focus blurs using deconvolution-inspired neural filters.', badge: '✅ LIVE', status: 'live', slug: 'ai-sharpening' },
+  { id: 59, category: 'AI Features', name: 'AI Color Correction', description: 'Neural color matching to balance tones.', badge: '✅ LIVE', status: 'live', slug: 'ai-color-correction' },
+  { id: 60, category: 'AI Features', name: 'AI Old Photo Restoration', description: 'Repair cracks, scratches, and fade damage from scanned historical images.', badge: '✅ LIVE', status: 'live', slug: 'ai-old-photo-restoration' },
+  { id: 61, category: 'AI Features', name: 'AI Product Enhancement', description: 'Brighten, shadow-correct, and highlight commercial product shots.', badge: '✅ LIVE', status: 'live', slug: 'ai-product-enhancement' },
 
   // 4. Ecommerce & Seller Tools
   { id: 61, category: 'Ecommerce & Seller', name: 'Amazon Image Checker', description: 'Verify if images meet Amazon\'s strict 1000px+ pure white background rules.', badge: 'Amazon Spec', status: 'coming-soon' },
