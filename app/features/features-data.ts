@@ -122,10 +122,18 @@ export const FEATURES_DATA: FeatureItem[] = [
   { id: 60, category: 'AI Features', name: 'AI Old Photo Restoration', description: 'Repair cracks, scratches, and fade damage from scanned historical images.', badge: '✅ LIVE', status: 'live', slug: 'ai-old-photo-restoration' },
   { id: 61, category: 'AI Features', name: 'AI Product Enhancement', description: 'Brighten, shadow-correct, and highlight commercial product shots.', badge: '✅ LIVE', status: 'live', slug: 'ai-product-enhancement' },
 
-  // 4. Ecommerce & Seller Tools
-  { id: 61, category: 'Ecommerce & Seller', name: 'Amazon Image Checker', description: 'Verify if images meet Amazon\'s strict 1000px+ pure white background rules.', badge: 'Amazon Spec', status: 'coming-soon' },
-  { id: 62, category: 'Ecommerce & Seller', name: 'Flipkart Image Checker', description: 'Ensure assets match Flipkart listing size and quality policies.', badge: 'Flipkart Spec', status: 'coming-soon' },
-  { id: 63, category: 'Ecommerce & Seller', name: 'Product Background White Generator', description: 'Force transparent spaces to pure white (#FFFFFF) for marketplace standards.', badge: 'Ecom Standard', status: 'coming-soon' },
+  // ===== DAYS 12-15: METADATA, SECURITY & ECOMMERCE (9 Tools) =====
+  { id: 62, category: 'Metadata & Security', name: 'EXIF Viewer', description: 'View complete EXIF data, camera settings, GPS location, and technical metadata.', badge: '✅ LIVE', status: 'live', slug: 'exif-viewer' },
+  { id: 63, category: 'Metadata & Security', name: 'EXIF Remover', description: 'Strip all EXIF data, camera info, GPS location for privacy protection.', badge: '✅ LIVE', status: 'live', slug: 'exif-remover' },
+  { id: 64, category: 'Metadata & Security', name: 'GPS Data Remover', description: 'Remove GPS location coordinates and geotags from photos for location privacy.', badge: '✅ LIVE', status: 'live', slug: 'gps-remover' },
+  { id: 65, category: 'Metadata & Security', name: 'Copyright Metadata Editor', description: 'Add copyright, artist, and description metadata to protect intellectual property.', badge: '✅ LIVE', status: 'live', slug: 'copyright-editor' },
+  { id: 66, category: 'Metadata & Security', name: 'Image Encryption', description: 'Password-protect images with AES-256 encryption for secure sharing.', badge: '✅ LIVE', status: 'live', slug: 'image-encryption' },
+  { id: 67, category: 'Metadata & Security', name: 'Auto File Expiry', description: 'Generate temporary links that automatically expire for time-limited sharing.', badge: '✅ LIVE', status: 'live', slug: 'auto-expiry' },
+  { id: 68, category: 'Ecommerce & Seller', name: 'Amazon Image Checker', description: 'Verify images meet Amazon\'s strict 1000px+ pure white background requirements.', badge: '✅ LIVE', status: 'live', slug: 'amazon-checker' },
+  { id: 69, category: 'Ecommerce & Seller', name: 'Flipkart Image Checker', description: 'Validate images against Flipkart marketplace listing requirements.', badge: '✅ LIVE', status: 'live', slug: 'flipkart-checker' },
+  { id: 70, category: 'Ecommerce & Seller', name: 'Product Background White', description: 'Force transparent backgrounds to pure white (#FFFFFF) for marketplace compliance.', badge: '✅ LIVE', status: 'live', slug: 'product-white-bg' },
+
+  // 4. Ecommerce & Seller Tools (Remaining)
   { id: 64, category: 'Ecommerce & Seller', name: 'Product Shadow Generator', description: 'Generate realistic drop or contact shadows beneath product subjects.', badge: 'Shadow Render', status: 'coming-soon' },
   { id: 65, category: 'Ecommerce & Seller', name: 'Product Reflection Generator', description: 'Apply professional mirror reflection effects below commercial items.', badge: 'Mirror FX', status: 'coming-soon' },
 
