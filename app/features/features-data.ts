@@ -70,19 +70,21 @@ export const FEATURES_DATA: FeatureItem[] = [
   { id: 30, category: 'Resize & Dimension Tools', name: 'Social Media Kit', description: 'Generate 6+ social media sizes in one click.', badge: '✅ LIVE', status: 'live', slug: 'social-media-kit' },
   { id: 31, category: 'SEO & Developer', name: 'Favicon Generator', description: 'Generate favicons in all required sizes (16px-256px).', badge: '✅ LIVE', status: 'live', slug: 'favicon-generator' },
 
-  // ===== COMING SOON (199 Tools - Following MASTER-SPECIFICATION.md) =====
+  // ===== DAY 2 TOOLS (6 Advanced Compression Tools) =====
+  { id: 32, category: 'Compression & Optimization', name: 'Lossless Compression', description: 'Zero quality loss optimization with WebP lossless mode and PNG palette preservation.', badge: '✅ LIVE', status: 'live', slug: 'lossless-compression' },
+  { id: 33, category: 'Compression & Optimization', name: 'Smart Compression', description: 'SSIM-based quality detection with automatic optimization for perfect size/quality balance.', badge: '✅ LIVE', status: 'live', slug: 'smart-compression' },
+  { id: 34, category: 'Compression & Optimization', name: 'Progressive JPEG', description: 'Multi-pass progressive encoding for faster perceived loading on slow connections.', badge: '✅ LIVE', status: 'live', slug: 'progressive-jpeg' },
+  { id: 35, category: 'Compression & Optimization', name: 'PNG Optimization', description: 'Advanced color palette reduction, 8-bit quantization, and metadata stripping.', badge: '✅ LIVE', status: 'live', slug: 'png-optimization' },
+  { id: 36, category: 'Compression & Optimization', name: 'SVG Optimization', description: 'Path simplification, metadata stripping, and XML minification for vector graphics.', badge: '✅ LIVE', status: 'live', slug: 'svg-optimization' },
+  { id: 37, category: 'Compression & Optimization', name: 'AVIF Optimization', description: 'Next-generation AV1 encoding with chroma subsampling and speed control.', badge: '✅ LIVE', status: 'live', slug: 'avif-optimization' },
+
+  // ===== COMING SOON (193 Tools Remaining) =====
   
-  // 1. Compression & Optimization
-  { id: 32, category: 'Compression & Optimization', name: 'Lossless Compression', description: 'Compress images without losing quality using WebP, PNG, or AVIF lossless settings.', badge: 'WASM Optimized', status: 'coming-soon' },
-  { id: 33, category: 'Compression & Optimization', name: 'Smart Compression', description: 'Automatic quality adjustments based on structural similarity (SSIM) to maximize bytes saved.', badge: 'AI/SSIM', status: 'coming-soon' },
-  { id: 34, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: 'WASM Option', status: 'coming-soon' },
-  { id: 35, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: 'Batch Support', status: 'coming-soon' },
-  { id: 36, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: 'Native File System', status: 'coming-soon' },
-  { id: 37, category: 'Compression & Optimization', name: 'Progressive JPEG Optimization', description: 'Multi-pass progressive scans for faster page rendering on slow network connections.', badge: 'MozJPEG Core', status: 'coming-soon' },
-  { id: 38, category: 'Compression & Optimization', name: 'PNG Optimization', description: 'Advanced color palette reduction and interlace pass configurations.', badge: 'OxiPNG Core', status: 'coming-soon' },
-  { id: 39, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
-  { id: 40, category: 'Compression & Optimization', name: 'SVG Optimization', description: 'Path simplification, metadata stripping, and XML minification.', badge: 'Clean Vector', status: 'coming-soon' },
-  { id: 41, category: 'Compression & Optimization', name: 'AVIF Optimization', description: 'Next-generation AV1 coding for exceptional compression efficiency at high quality.', badge: 'AVIF Core', status: 'coming-soon' },
+  // 1. Compression & Optimization (Remaining)
+  { id: 38, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: 'WASM Option', status: 'coming-soon' },
+  { id: 39, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: 'Batch Support', status: 'coming-soon' },
+  { id: 40, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: 'Native File System', status: 'coming-soon' },
+  { id: 41, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
 
   // 2. Format Conversion
   { id: 42, category: 'Format Conversion', name: 'JPG to PNG', description: 'Convert lossy JPEGs into transparent lossless PNG format with alpha channel addition.', badge: 'Converter', status: 'coming-soon' },
