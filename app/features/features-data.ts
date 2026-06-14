@@ -78,24 +78,27 @@ export const FEATURES_DATA: FeatureItem[] = [
   { id: 36, category: 'Compression & Optimization', name: 'SVG Optimization', description: 'Path simplification, metadata stripping, and XML minification for vector graphics.', badge: '✅ LIVE', status: 'live', slug: 'svg-optimization' },
   { id: 37, category: 'Compression & Optimization', name: 'AVIF Optimization', description: 'Next-generation AV1 encoding with chroma subsampling and speed control.', badge: '✅ LIVE', status: 'live', slug: 'avif-optimization' },
 
-  // ===== COMING SOON (193 Tools Remaining) =====
+  // ===== DAYS 4-5: FORMAT CONVERSION MATRIX (9 Tools) =====
+  { id: 38, category: 'Format Conversion', name: 'JPG to PNG', description: 'Convert lossy JPEGs into transparent lossless PNG format with alpha channel addition.', badge: '✅ LIVE', status: 'live', slug: 'jpg-to-png' },
+  { id: 39, category: 'Format Conversion', name: 'PNG to JPG', description: 'Convert transparent PNGs into standard JPEGs with custom background color replacement.', badge: '✅ LIVE', status: 'live', slug: 'png-to-jpg' },
+  { id: 40, category: 'Format Conversion', name: 'JPG to WebP', description: 'Upgrade JPEGs to modern WebP format for up to 30% smaller file sizes.', badge: '✅ LIVE', status: 'live', slug: 'jpg-to-webp' },
+  { id: 41, category: 'Format Conversion', name: 'WebP to JPG', description: 'Export WebP assets to widely compatible JPEG format for legacy system support.', badge: '✅ LIVE', status: 'live', slug: 'webp-to-jpg' },
+  { id: 42, category: 'Format Conversion', name: 'PNG to WebP', description: 'Convert PNGs to WebP while fully preserving alpha channel transparency.', badge: '✅ LIVE', status: 'live', slug: 'png-to-webp' },
+  { id: 43, category: 'Format Conversion', name: 'WebP to PNG', description: 'Decode WebP images back into lossless 24-bit PNG files.', badge: '✅ LIVE', status: 'live', slug: 'webp-to-png' },
+  { id: 44, category: 'Format Conversion', name: 'JPG to AVIF', description: 'Convert JPEGs to AVIF to leverage advanced HDR and wide color gamut support.', badge: '✅ LIVE', status: 'live', slug: 'jpg-to-avif' },
+  { id: 45, category: 'Format Conversion', name: 'AVIF to JPG', description: 'Down-convert AVIF files to JPEG for older devices and legacy web engines.', badge: '✅ LIVE', status: 'live', slug: 'avif-to-jpg' },
+  { id: 46, category: 'Format Conversion', name: 'HEIC to JPG', description: 'Decode Apple HEIC/HEIF camera photos into standard JPEG files.', badge: '✅ LIVE', status: 'live', slug: 'heic-to-jpg' },
+
+  // ===== COMING SOON (184 Tools Remaining) =====
   
   // 1. Compression & Optimization (Remaining)
-  { id: 38, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: 'WASM Option', status: 'coming-soon' },
-  { id: 39, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: 'Batch Support', status: 'coming-soon' },
-  { id: 40, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: 'Native File System', status: 'coming-soon' },
-  { id: 41, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
+  { id: 47, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: 'WASM Option', status: 'coming-soon' },
+  { id: 48, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: 'Batch Support', status: 'coming-soon' },
+  { id: 49, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: 'Native File System', status: 'coming-soon' },
+  { id: 50, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
 
-  // 2. Format Conversion
-  { id: 42, category: 'Format Conversion', name: 'JPG to PNG', description: 'Convert lossy JPEGs into transparent lossless PNG format with alpha channel addition.', badge: 'Converter', status: 'coming-soon' },
-  { id: 43, category: 'Format Conversion', name: 'PNG to JPG', description: 'Convert transparent PNGs into standard JPEGs with custom background color replacement.', badge: 'Converter', status: 'coming-soon' },
-  { id: 44, category: 'Format Conversion', name: 'JPG to WEBP', description: 'Upgrade JPEGs to modern WebP format for up to 30% smaller file sizes.', badge: 'WASM WebP', status: 'coming-soon' },
-  { id: 45, category: 'Format Conversion', name: 'WEBP to JPG', description: 'Export WebP assets to widely compatible JPEG format for legacy system support.', badge: 'Converter', status: 'coming-soon' },
-  { id: 46, category: 'Format Conversion', name: 'PNG to WEBP', description: 'Convert PNGs to WebP while fully preserving alpha channel transparency.', badge: 'WASM WebP', status: 'coming-soon' },
-  { id: 47, category: 'Format Conversion', name: 'WEBP to PNG', description: 'Decode WebP images back into lossless 24-bit PNG files.', badge: 'Converter', status: 'coming-soon' },
-  { id: 48, category: 'Format Conversion', name: 'JPG to AVIF', description: 'Convert JPEGs to AVIF to leverage advanced HDR and wide color gamut support.', badge: 'AVIF WASM', status: 'coming-soon' },
-  { id: 49, category: 'Format Conversion', name: 'AVIF to JPG', description: 'Down-convert AVIF files to JPEG for older devices and legacy web engines.', badge: 'Converter', status: 'coming-soon' },
-  { id: 50, category: 'Format Conversion', name: 'HEIC to JPG', description: 'Decode Apple HEIC/HEIF camera photos into standard JPEG files.', badge: 'Apple Decoder', status: 'coming-soon' },
+  // 2. Format Conversion (Remaining)
+  { id: 51, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: 'TIFF Decoder', status: 'coming-soon' },
   { id: 51, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: 'TIFF Decoder', status: 'coming-soon' },
 
   // Continue with remaining 189 features...
