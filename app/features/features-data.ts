@@ -89,17 +89,24 @@ export const FEATURES_DATA: FeatureItem[] = [
   { id: 45, category: 'Format Conversion', name: 'AVIF to JPG', description: 'Down-convert AVIF files to JPEG for older devices and legacy web engines.', badge: '✅ LIVE', status: 'live', slug: 'avif-to-jpg' },
   { id: 46, category: 'Format Conversion', name: 'HEIC to JPG', description: 'Decode Apple HEIC/HEIF camera photos into standard JPEG files.', badge: '✅ LIVE', status: 'live', slug: 'heic-to-jpg' },
 
-  // ===== COMING SOON (184 Tools Remaining) =====
+  // ===== DAYS 6-8: ADVANCED RESIZE & DIMENSIONS (6 Tools) =====
+  { id: 47, category: 'Resize & Dimension Tools', name: 'Percentage Resize', description: 'Scale images by percentage with quick preset buttons (25%, 50%, 75%, 150%, 200%).', badge: '✅ LIVE', status: 'live', slug: 'percentage-resize' },
+  { id: 48, category: 'Resize & Dimension Tools', name: 'Fixed Dimension Resize', description: 'Resize to exact pixel dimensions with contain, cover, or fill modes.', badge: '✅ LIVE', status: 'live', slug: 'fixed-dimension-resize' },
+  { id: 49, category: 'Resize & Dimension Tools', name: 'Aspect Ratio Lock', description: 'Enforce specific aspect ratios (16:9, 1:1, 9:16) with crop or fit modes.', badge: '✅ LIVE', status: 'live', slug: 'aspect-ratio-lock' },
+  { id: 50, category: 'Resize & Dimension Tools', name: 'Social Media Presets', description: 'One-click resize for Instagram, Facebook, Twitter, YouTube with 15+ platform presets.', badge: '✅ LIVE', status: 'live', slug: 'social-media-presets' },
+  { id: 51, category: 'Resize & Dimension Tools', name: 'Ecommerce Presets', description: 'Amazon, eBay, Etsy, Shopify marketplace-compliant image sizing with white backgrounds.', badge: '✅ LIVE', status: 'live', slug: 'ecommerce-presets' },
+  { id: 52, category: 'Resize & Dimension Tools', name: 'DPI Changer', description: 'Change image DPI/PPI metadata for print optimization (72, 150, 300, 600, 1200 DPI).', badge: '✅ LIVE', status: 'live', slug: 'dpi-changer' },
+
+  // ===== COMING SOON (178 Tools Remaining) =====
   
   // 1. Compression & Optimization (Remaining)
-  { id: 47, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: 'WASM Option', status: 'coming-soon' },
-  { id: 48, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: 'Batch Support', status: 'coming-soon' },
-  { id: 49, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: 'Native File System', status: 'coming-soon' },
-  { id: 50, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
+  { id: 53, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: 'WASM Option', status: 'coming-soon' },
+  { id: 54, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: 'Batch Support', status: 'coming-soon' },
+  { id: 55, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: 'Native File System', status: 'coming-soon' },
+  { id: 56, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
 
   // 2. Format Conversion (Remaining)
-  { id: 51, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: 'TIFF Decoder', status: 'coming-soon' },
-  { id: 51, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: 'TIFF Decoder', status: 'coming-soon' },
+  { id: 57, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: 'TIFF Decoder', status: 'coming-soon' },
 
   // Continue with remaining 189 features...
   // (I'll add key features from each category to reach 230 total)
