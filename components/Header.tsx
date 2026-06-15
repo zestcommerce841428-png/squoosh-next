@@ -1,9 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { AppBar, Toolbar, Typography, Button, Container, Stack, Box, IconButton } from '@mui/material';
+import {
+  AppBar, Toolbar, Typography, Button, Container, Stack, Box, IconButton,
+  Drawer, List, ListItem, ListItemButton, ListItemText, Divider,
+} from '@mui/material';
 import { useColorMode } from './ThemeRegistry';
 import LanguageSwitcher from './LanguageSwitcher';
+import { useAuth } from '../lib/supabase/AuthProvider';
 
 const SunIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -25,59 +30,137 @@ const MoonIcon = () => (
   </svg>
 );
 
+const MenuIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+);
+
+const NAV_LINKS = [
+  { href: '/compress', label: 'Workspace' },
+  { href: '/features', label: 'Features' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
 export default function Header() {
   const { mode, toggleColorMode } = useColorMode();
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const accountHref = user ? '/profile' : '/auth/login';
+  const accountLabel = user ? 'Profile' : 'Sign in';
 
   return (
-    <AppBar 
-      position="sticky" 
-      elevation={0} 
-      sx={{ 
-        borderBottom: '1px solid', 
+    <AppBar
+      position="sticky"
+      elevation={0}
+      sx={{
+        borderBottom: '1px solid',
         borderColor: 'divider',
         background: mode === 'dark' ? 'rgba(9, 13, 22, 0.8)' : 'rgba(248, 250, 252, 0.8)',
         backdropFilter: 'blur(8px)',
-        color: 'text.primary'
+        color: 'text.primary',
       }}
     >
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between', gap: 1 }}>
           {/* Logo */}
           <Box component={Link} href="/" sx={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Box component="img" src="/icon.png" alt="Squoosh Next Logo" sx={{ width: 24, height: 24, borderRadius: "4px" }} />
-            <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>
+            <Box component="img" src="/icon.png" alt="Squoosh Next Logo" sx={{ width: 24, height: 24, borderRadius: '4px' }} />
+            <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: '-0.5px', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
               Squoosh Next
             </Typography>
           </Box>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation */}
           <Stack direction="row" spacing={{ xs: 1, md: 3 }} sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Button component={Link} href="/compress" sx={{ color: 'text.secondary', fontWeight: 600 }}>Workspace</Button>
-            <Button component={Link} href="/features" sx={{ color: 'text.secondary', fontWeight: 600 }}>Features</Button>
-            <Button component={Link} href="/blog" sx={{ color: 'text.secondary', fontWeight: 600 }}>Blog</Button>
-            <Button component={Link} href="/about" sx={{ color: 'text.secondary', fontWeight: 600 }}>About</Button>
-            <Button component={Link} href="/contact" sx={{ color: 'text.secondary', fontWeight: 600 }}>Contact</Button>
+            {NAV_LINKS.map((l) => (
+              <Button key={l.href} component={Link} href={l.href} sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                {l.label}
+              </Button>
+            ))}
           </Stack>
 
           {/* Actions */}
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <LanguageSwitcher />
-            <IconButton onClick={toggleColorMode} color="inherit" size="small">
+          <Stack direction="row" spacing={{ xs: 0.5, sm: 1.5 }} alignItems="center">
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <LanguageSwitcher />
+            </Box>
+            <IconButton onClick={toggleColorMode} color="inherit" size="small" aria-label="Toggle color mode">
               {mode === 'light' ? <MoonIcon /> : <SunIcon />}
             </IconButton>
+            <Button
+              component={Link}
+              href={accountHref}
+              variant="outlined"
+              color="inherit"
+              size="small"
+              sx={{ fontWeight: 700, display: { xs: 'none', md: 'inline-flex' } }}
+            >
+              {accountLabel}
+            </Button>
             <Button
               component={Link}
               href="/compress"
               variant="contained"
               color="primary"
               size="small"
-              sx={{ fontWeight: 700 }}
+              sx={{ fontWeight: 700, display: { xs: 'none', sm: 'inline-flex' } }}
             >
               Start Compressing
             </Button>
+            <IconButton
+              color="inherit"
+              size="small"
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+              sx={{ display: { xs: 'inline-flex', md: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
           </Stack>
         </Toolbar>
       </Container>
+
+      {/* Mobile Drawer */}
+      <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
+        <Box sx={{ width: 260 }} role="presentation" onClick={() => setOpen(false)}>
+          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box component="img" src="/icon.png" alt="" sx={{ width: 24, height: 24, borderRadius: '4px' }} />
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>Squoosh Next</Typography>
+          </Box>
+          <Divider />
+          <List>
+            {NAV_LINKS.map((l) => (
+              <ListItem key={l.href} disablePadding>
+                <ListItemButton component={Link} href={l.href}>
+                  <ListItemText primary={l.label} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <Box sx={{ p: 2 }}>
+            <LanguageSwitcher />
+            <Button component={Link} href={accountHref} variant="outlined" color="inherit" fullWidth sx={{ fontWeight: 700, mt: 2 }}>
+              {accountLabel}
+            </Button>
+            <Button
+              component={Link}
+              href="/compress"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ fontWeight: 700, mt: 1.5 }}
+            >
+              Start Compressing
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
     </AppBar>
   );
 }

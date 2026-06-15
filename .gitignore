@@ -3,6 +3,9 @@ node_modules/
 /.pnp
 .pnp.js
 
+# Hostinger upload script contains a live shared secret — keep out of git
+hostinger/upload.php
+
 # Testing
 /coverage
 

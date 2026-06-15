@@ -1,178 +1,111 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Stack, Alert, Typography, TextField, Box, Button, Slider } from '@mui/material';
-import { ToolLayout } from '@/components/ToolComponents';
+import { Card, Stack, Alert, Typography, Box, TextField, Slider, Button } from '@mui/material';
+import { ToolLayout, ActionButtons } from '@/components/ToolComponents';
+import { fileToImage, canvasToBlob, downloadBlob, drawWrappedText } from '@/lib/imageTools';
+
+const W = 1080, H = 1080;
 
 export default function QuoteGeneratorPage() {
-  const [quoteUrl, setQuoteUrl] = useState<string | null>(null);
+  const [quote, setQuote] = useState('The best way to predict the future is to create it.');
+  const [author, setAuthor] = useState('Peter Drucker');
+  const [bgImg, setBgImg] = useState<File | null>(null);
+  const [bg1, setBg1] = useState('#6366f1');
+  const [bg2, setBg2] = useState('#3b82f6');
+  const [overlay, setOverlay] = useState(40);
+  const [fontSize, setFontSize] = useState(60);
+  const [outUrl, setOutUrl] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const [quote, setQuote] = useState<string>('The only way to do great work is to love what you do.');
-  const [author, setAuthor] = useState<string>('- Steve Jobs');
-  const [fontSize, setFontSize] = useState<number>(48);
-  const [bgColor, setBgColor] = useState<string>('#1e293b');
 
-  const generateQuote = async () => {
-    if (!quote) return;
-
+  const render = async () => {
     setProcessing(true);
-    setError(null);
-
     try {
       const canvas = document.createElement('canvas');
-      canvas.width = 1080;
-      canvas.height = 1080;
+      canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext('2d')!;
-
-      // Background
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, 1080, 1080);
-
-      // Quote
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = `${fontSize}px Georgia`;
+      if (bgImg) {
+        const img = await fileToImage(bgImg);
+        const scale = Math.max(W / img.width, H / img.height);
+        const dw = img.width * scale, dh = img.height * scale;
+        ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+        ctx.fillStyle = `rgba(0,0,0,${overlay / 100})`;
+        ctx.fillRect(0, 0, W, H);
+      } else {
+        const grad = ctx.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, bg1); grad.addColorStop(1, bg2);
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+      }
+      ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-
-      const words = quote.split(' ');
-      const lines: string[] = [];
-      let currentLine = '';
-
-      words.forEach(word => {
-        const testLine = currentLine + word + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > 900 && currentLine !== '') {
-          lines.push(currentLine);
-          currentLine = word + ' ';
-        } else {
-          currentLine = testLine;
-        }
-      });
-      lines.push(currentLine);
-
-      const lineHeight = fontSize * 1.5;
-      const totalHeight = lines.length * lineHeight;
-      let startY = (1080 - totalHeight) / 2;
-
-      lines.forEach(line => {
-        ctx.fillText(line.trim(), 540, startY);
-        startY += lineHeight;
-      });
-
-      // Author
-      if (author) {
-        ctx.font = `italic ${fontSize * 0.6}px Georgia`;
-        ctx.fillText(author, 540, startY + 80);
+      ctx.font = `italic 700 ${fontSize}px Georgia, serif`;
+      const lh = fontSize * 1.3;
+      // count lines for centering
+      const words = ('“' + quote + '”').split(/\s+/);
+      let lines = 1, cur = '';
+      for (const wd of words) { const t = cur ? cur + ' ' + wd : wd; if (ctx.measureText(t).width > W * 0.8 && cur) { lines++; cur = wd; } else cur = t; }
+      const startY = H / 2 - ((lines - 1) * lh) / 2;
+      const used = drawWrappedText(ctx, '“' + quote + '”', W / 2, startY, W * 0.8, lh);
+      if (author.trim()) {
+        ctx.font = `600 ${fontSize * 0.5}px Arial, sans-serif`;
+        ctx.fillText('— ' + author, W / 2, startY + used + fontSize * 0.6);
       }
-
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), 'image/png');
-      });
-
-      const url = URL.createObjectURL(blob);
-      setQuoteUrl(url);
-    } catch (err) {
-      setError('Quote generation failed.');
-    } finally {
-      setProcessing(false);
-    }
+      const blob = await canvasToBlob(canvas, 'image/jpeg', 0.92);
+      setOutUrl(URL.createObjectURL(blob));
+    } finally { setProcessing(false); }
   };
 
-  const downloadQuote = () => {
-    if (!quoteUrl) return;
-    const a = document.createElement('a');
-    a.href = quoteUrl;
-    a.download = 'quote-1080x1080.png';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const reset = () => {
-    setQuoteUrl(null);
-    setError(null);
-  };
+  const download = async () => { const r = await fetch(outUrl!); downloadBlob(await r.blob(), 'quote.jpg'); };
+  const reset = () => { setBgImg(null); setOutUrl(null); };
 
   return (
     <ToolLayout
       title="Quote Generator"
-      description="Create beautiful quote graphics for social media with custom fonts and colors"
-      features={['Custom Quotes', 'Auto Wrap', 'Beautiful Fonts', 'HD Export']}
+      description="Create beautiful 1080×1080 quote images with a gradient or your own background photo. Generated in your browser."
+      features={['Gradient or Photo', 'Quote + Author', 'Custom Overlay', 'PNG/JPG Export']}
     >
-      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
       <Stack spacing={3}>
-        {quoteUrl && (
-          <Card sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>Your Quote (1080×1080)</Typography>
-            <img src={quoteUrl} alt="Quote" style={{ width: '100%', height: 'auto' }} />
-          </Card>
+        {outUrl && (
+          <Box sx={{ textAlign: 'center', bgcolor: 'action.hover', borderRadius: 1, p: 1 }}>
+            <img src={outUrl} alt="preview" style={{ maxWidth: '100%', maxHeight: 460, objectFit: 'contain' }} />
+          </Box>
         )}
-
-        <Card sx={{ p: 3 }}>
-          <Stack spacing={3}>
-            <TextField
-              label="Quote"
-              value={quote}
-              onChange={(e) => setQuote(e.target.value)}
-              fullWidth
-              multiline
-              rows={3}
-              placeholder="Enter your quote..."
-            />
-
-            <TextField
-              label="Author"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              fullWidth
-              placeholder="- Author Name"
-            />
-
-            <Box>
-              <Typography variant="body2" gutterBottom>
-                Font Size: {fontSize}px
-              </Typography>
-              <Slider
-                value={fontSize}
-                onChange={(e, val) => setFontSize(val as number)}
-                min={24}
-                max={80}
-                valueLabelDisplay="auto"
-              />
-            </Box>
-
-            <Box>
-              <Typography variant="body2" gutterBottom>Background Color</Typography>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <input
-                  type="color"
-                  value={bgColor}
-                  onChange={(e) => setBgColor(e.target.value)}
-                  style={{ width: 60, height: 40, cursor: 'pointer', border: 'none' }}
-                />
-                <Typography variant="body2">{bgColor}</Typography>
+        <Card sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack spacing={2.5}>
+            <TextField label="Quote" fullWidth multiline minRows={2} value={quote} onChange={(e) => setQuote(e.target.value)} />
+            <TextField label="Author" fullWidth value={author} onChange={(e) => setAuthor(e.target.value)} />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }}>
+              <Button variant="outlined" component="label">
+                {bgImg ? 'Change Background' : 'Upload Background Photo'}
+                <input hidden type="file" accept="image/*" onChange={(e) => setBgImg(e.target.files?.[0] || null)} />
+              </Button>
+              {bgImg && <Button color="inherit" onClick={() => setBgImg(null)}>Use Gradient Instead</Button>}
+            </Stack>
+            {!bgImg ? (
+              <Stack direction="row" spacing={3}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2">Color 1</Typography>
+                  <input aria-label="Gradient color 1" type="color" value={bg1} onChange={(e) => setBg1(e.target.value)} style={{ width: 48, height: 40, border: 'none', background: 'none' }} />
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2">Color 2</Typography>
+                  <input aria-label="Gradient color 2" type="color" value={bg2} onChange={(e) => setBg2(e.target.value)} style={{ width: 48, height: 40, border: 'none', background: 'none' }} />
+                </Box>
               </Stack>
+            ) : (
+              <Box>
+                <Typography variant="body2">Dark Overlay: {overlay}%</Typography>
+                <Slider value={overlay} min={0} max={80} onChange={(_, v) => setOverlay(v as number)} />
+              </Box>
+            )}
+            <Box>
+              <Typography variant="body2">Font Size: {fontSize}px</Typography>
+              <Slider value={fontSize} min={32} max={100} onChange={(_, v) => setFontSize(v as number)} />
             </Box>
           </Stack>
         </Card>
-
-        <Stack direction="row" spacing={2}>
-          <Button variant="outlined" onClick={reset} fullWidth>
-            Reset
-          </Button>
-          {!quoteUrl ? (
-            <Button variant="contained" onClick={generateQuote} disabled={processing || !quote} fullWidth>
-              {processing ? 'Generating...' : 'Generate Quote'}
-            </Button>
-          ) : (
-            <Button variant="contained" color="success" onClick={downloadQuote} fullWidth>
-              Download
-            </Button>
-          )}
-        </Stack>
+        <ActionButtons onReset={reset} onProcess={render} onDownload={download} processing={processing} processed={!!outUrl} />
       </Stack>
     </ToolLayout>
   );

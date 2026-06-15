@@ -1,169 +1,92 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Stack, Alert, Typography, Slider, Box, TextField } from '@mui/material';
-import { ToolLayout, UploadArea, PreviewArea, ActionButtons } from '@/components/ToolComponents';
+import { Card, Stack, Alert, Typography, Box, Slider } from '@mui/material';
+import { ToolLayout, UploadArea, ActionButtons } from '@/components/ToolComponents';
+import { fileToImage, canvasToBlob, downloadBlob, replaceExt } from '@/lib/imageTools';
 
 export default function BorderToolPage() {
   const [file, setFile] = useState<File | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
-  const [borderedUrl, setBorderedUrl] = useState<string | null>(null);
+  const [outUrl, setOutUrl] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const [borderWidth, setBorderWidth] = useState<number>(20);
-  const [borderColor, setBorderColor] = useState<string>('#FFFFFF');
-  const [borderRadius, setBorderRadius] = useState<number>(0);
 
-  const handleFileSelect = (selectedFile: File) => {
-    setFile(selectedFile);
-    const url = URL.createObjectURL(selectedFile);
-    setOriginalUrl(url);
-    setBorderedUrl(null);
-    setError(null);
+  const [width, setWidth] = useState(20);
+  const [radius, setRadius] = useState(0);
+  const [color, setColor] = useState('#ffffff');
+
+  const handleFileSelect = (f: File) => {
+    if (!f.type.startsWith('image/')) { setError('Please choose an image.'); return; }
+    setFile(f); setOriginalUrl(URL.createObjectURL(f)); setOutUrl(null); setError(null);
   };
 
-  const applyBorder = async () => {
-    if (!file || !originalUrl) return;
-
-    setProcessing(true);
-    setError(null);
-
+  const apply = async () => {
+    if (!file) return;
+    setProcessing(true); setError(null);
     try {
-      const img = new Image();
-      img.src = originalUrl;
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
-
+      const img = await fileToImage(file);
+      const b = width;
       const canvas = document.createElement('canvas');
-      canvas.width = img.width + borderWidth * 2;
-      canvas.height = img.height + borderWidth * 2;
+      canvas.width = img.width + b * 2;
+      canvas.height = img.height + b * 2;
       const ctx = canvas.getContext('2d')!;
-
-      // Draw border background
-      ctx.fillStyle = borderColor;
+      ctx.fillStyle = color;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw image with optional rounded corners
-      if (borderRadius > 0) {
+      if (radius > 0) {
         ctx.save();
+        const r = Math.min(radius, img.width / 2, img.height / 2);
         ctx.beginPath();
-        ctx.roundRect(borderWidth, borderWidth, img.width, img.height, borderRadius);
+        ctx.roundRect(b, b, img.width, img.height, r);
         ctx.clip();
       }
-
-      ctx.drawImage(img, borderWidth, borderWidth);
-
-      if (borderRadius > 0) {
-        ctx.restore();
-      }
-
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), 'image/png');
-      });
-
-      const url = URL.createObjectURL(blob);
-      setBorderedUrl(url);
-    } catch (err) {
-      setError('Border application failed. Please try another image.');
-    } finally {
-      setProcessing(false);
-    }
+      ctx.drawImage(img, b, b);
+      if (radius > 0) ctx.restore();
+      const blob = await canvasToBlob(canvas, 'image/png');
+      setOutUrl(URL.createObjectURL(blob));
+    } catch { setError('Failed to add border.'); }
+    finally { setProcessing(false); }
   };
 
-  const downloadImage = () => {
-    if (!borderedUrl || !file) return;
-    const a = document.createElement('a');
-    a.href = borderedUrl;
-    a.download = file.name.replace(/(\.[^.]+)$/, '-bordered.png');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const download = async () => {
+    if (!file) return;
+    const res = await fetch(outUrl!);
+    downloadBlob(await res.blob(), replaceExt(file.name, '-bordered.png'));
   };
 
-  const reset = () => {
-    setFile(null);
-    setOriginalUrl(null);
-    setBorderedUrl(null);
-    setError(null);
-    setBorderWidth(20);
-    setBorderColor('#FFFFFF');
-    setBorderRadius(0);
-  };
+  const reset = () => { setFile(null); setOriginalUrl(null); setOutUrl(null); setError(null); };
 
   return (
     <ToolLayout
       title="Border Tool"
-      description="Add custom borders and frames to your images with color and radius control"
-      features={['Custom Width', 'Any Color', 'Rounded Corners', 'Transparent']}
+      description="Add a solid color border (with optional rounded corners) around any image — processed locally."
+      features={['Custom Width', 'Any Color', 'Rounded Corners', 'PNG Output']}
     >
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
       {!file ? (
         <UploadArea onFileSelect={handleFileSelect} />
       ) : (
         <Stack spacing={3}>
-          <PreviewArea imageUrl={borderedUrl || originalUrl} />
-
-          <Card sx={{ p: 3 }}>
-            <Stack spacing={3}>
-              <Box>
-                <Typography variant="body2" gutterBottom>
-                  Border Width: {borderWidth}px
-                </Typography>
-                <Slider
-                  value={borderWidth}
-                  onChange={(e, val) => setBorderWidth(val as number)}
-                  min={0}
-                  max={100}
-                  valueLabelDisplay="auto"
-                />
+          <Box sx={{ textAlign: 'center', bgcolor: 'action.hover', borderRadius: 1, p: 1 }}>
+            <img src={outUrl || originalUrl!} alt="preview" style={{ maxWidth: '100%', maxHeight: 460, objectFit: 'contain' }} />
+          </Box>
+          <Card sx={{ p: { xs: 2, sm: 3 } }}>
+            <Stack spacing={2.5}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="body2">Border Color</Typography>
+                <input aria-label="Border color" type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ width: 48, height: 40, border: 'none', background: 'none' }} />
               </Box>
-
               <Box>
-                <Typography variant="body2" gutterBottom>
-                  Border Radius: {borderRadius}px
-                </Typography>
-                <Slider
-                  value={borderRadius}
-                  onChange={(e, val) => setBorderRadius(val as number)}
-                  min={0}
-                  max={50}
-                  valueLabelDisplay="auto"
-                />
+                <Typography variant="body2">Border Width: {width}px</Typography>
+                <Slider value={width} min={0} max={150} onChange={(_, v) => setWidth(v as number)} />
               </Box>
-
               <Box>
-                <Typography variant="body2" gutterBottom>
-                  Border Color
-                </Typography>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <input
-                    type="color"
-                    value={borderColor}
-                    onChange={(e) => setBorderColor(e.target.value)}
-                    style={{ width: 60, height: 40, cursor: 'pointer', border: 'none' }}
-                  />
-                  <TextField
-                    value={borderColor}
-                    onChange={(e) => setBorderColor(e.target.value)}
-                    size="small"
-                    placeholder="#FFFFFF"
-                  />
-                </Stack>
+                <Typography variant="body2">Corner Radius: {radius}px</Typography>
+                <Slider value={radius} min={0} max={300} onChange={(_, v) => setRadius(v as number)} />
               </Box>
             </Stack>
           </Card>
-
-          <ActionButtons
-            onReset={reset}
-            onProcess={applyBorder}
-            onDownload={downloadImage}
-            processing={processing}
-            processed={!!borderedUrl}
-          />
+          <ActionButtons onReset={reset} onProcess={apply} onDownload={download} processing={processing} processed={!!outUrl} />
         </Stack>
       )}
     </ToolLayout>

@@ -1,253 +1,67 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Stack, Alert, Typography, Box, Button, Slider, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { ToolLayout, UploadArea, PreviewArea } from '@/components/ToolComponents';
+import { Card, Stack, Alert, Typography, Box, Slider } from '@mui/material';
+import { ToolLayout, UploadArea, ActionButtons } from '@/components/ToolComponents';
+import { fileToImage, canvasToBlob, downloadBlob, replaceExt, formatBytes } from '@/lib/imageTools';
 
 export default function AvifToJpgPage() {
   const [file, setFile] = useState<File | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
-  const [convertedUrl, setConvertedUrl] = useState<string | null>(null);
+  const [outUrl, setOutUrl] = useState<string | null>(null);
+  const [outSize, setOutSize] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const [quality, setQuality] = useState(90);
-  const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
-  const [originalSize, setOriginalSize] = useState<number>(0);
-  const [convertedSize, setConvertedSize] = useState<number>(0);
+  const [quality, setQuality] = useState(92);
 
-  const bgColorOptions = [
-    { value: '#FFFFFF', label: 'White' },
-    { value: '#000000', label: 'Black' },
-    { value: '#FF0000', label: 'Red' },
-    { value: '#00FF00', label: 'Green' },
-    { value: '#0000FF', label: 'Blue' },
-    { value: '#FFFF00', label: 'Yellow' },
-  ];
-
-  const handleFileSelect = (selectedFile: File) => {
-    if (!selectedFile.type.includes('avif')) {
-      setError('Please upload an AVIF file');
-      return;
-    }
-    
-    setFile(selectedFile);
-    setOriginalSize(selectedFile.size);
-    const url = URL.createObjectURL(selectedFile);
-    setOriginalUrl(url);
-    setConvertedUrl(null);
-    setError(null);
+  const handleFileSelect = (f: File) => {
+    setFile(f); setOriginalUrl(URL.createObjectURL(f)); setOutUrl(null); setError(null);
   };
 
-  const convertImage = async () => {
-    if (!file || !originalUrl) return;
-
-    setProcessing(true);
-    setError(null);
-
+  const apply = async () => {
+    if (!file) return;
+    setProcessing(true); setError(null);
     try {
-      const img = new Image();
-      img.src = originalUrl;
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
-
+      const img = await fileToImage(file);
       const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d', { alpha: false })!;
-      
-      // Fill with background color (JPG doesn't support transparency)
-      ctx.fillStyle = backgroundColor;
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw image on top
       ctx.drawImage(img, 0, 0);
-
-      // Convert to JPEG with quality setting
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), 'image/jpeg', quality / 100);
-      });
-
-      setConvertedSize(blob.size);
-      const url = URL.createObjectURL(blob);
-      setConvertedUrl(url);
-    } catch (err) {
-      console.error(err);
-      setError('Conversion failed. Your browser may not support AVIF decoding.');
-    } finally {
-      setProcessing(false);
-    }
+      const blob = await canvasToBlob(canvas, 'image/jpeg', quality / 100);
+      setOutSize(blob.size);
+      setOutUrl(URL.createObjectURL(blob));
+    } catch {
+      setError('Could not decode this AVIF. Your browser may not support AVIF decoding — try Chrome/Edge/Firefox.');
+    } finally { setProcessing(false); }
   };
 
-  const downloadImage = () => {
-    if (!convertedUrl || !file) return;
-    const a = document.createElement('a');
-    a.href = convertedUrl;
-    a.download = file.name.replace(/\.avif$/i, '.jpg');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const reset = () => {
-    setFile(null);
-    setOriginalUrl(null);
-    setConvertedUrl(null);
-    setError(null);
-    setOriginalSize(0);
-    setConvertedSize(0);
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-  };
-
-  const sizeDiff = originalSize && convertedSize 
-    ? Math.round((convertedSize / originalSize - 1) * 100)
-    : 0;
+  const download = async () => { const r = await fetch(outUrl!); downloadBlob(await r.blob(), replaceExt(file!.name, '.jpg')); };
+  const reset = () => { setFile(null); setOriginalUrl(null); setOutUrl(null); setError(null); setOutSize(0); };
 
   return (
     <ToolLayout
-      title="AVIF to JPG Converter"
-      description="Convert next-generation AVIF images to legacy-compatible JPEG format for universal compatibility"
-      features={['Legacy Export', 'Universal Compatibility', 'Quality Control', 'Background Color']}
+      title="AVIF to JPG"
+      description="Convert AVIF images to widely-compatible JPG files right in your browser — nothing is uploaded."
+      features={['AVIF Decode', 'Quality Control', 'Instant Convert', 'No Upload']}
     >
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
       {!file ? (
         <UploadArea onFileSelect={handleFileSelect} accept="image/avif,.avif" />
       ) : (
         <Stack spacing={3}>
-          <PreviewArea imageUrl={convertedUrl || originalUrl} />
-
-          <Card sx={{ p: 3 }}>
-            <Stack spacing={3}>
-              <Box>
-                <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 700 }}>
-                  Quality Settings
-                </Typography>
-                <Typography variant="caption" color="text.secondary" gutterBottom>
-                  Quality: {quality}%
-                </Typography>
-                <Slider
-                  value={quality}
-                  onChange={(_, value) => setQuality(value as number)}
-                  min={60}
-                  max={100}
-                  step={5}
-                  marks
-                  valueLabelDisplay="auto"
-                />
-                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                  <Button size="small" variant="outlined" onClick={() => setQuality(80)}>
-                    Good (80%)
-                  </Button>
-                  <Button size="small" variant="outlined" onClick={() => setQuality(90)}>
-                    High (90%)
-                  </Button>
-                  <Button size="small" variant="outlined" onClick={() => setQuality(95)}>
-                    Max (95%)
-                  </Button>
-                </Stack>
-              </Box>
-
-              <Box>
-                <FormControl fullWidth>
-                  <InputLabel>Background Color</InputLabel>
-                  <Select
-                    value={backgroundColor}
-                    label="Background Color"
-                    onChange={(e) => setBackgroundColor(e.target.value)}
-                  >
-                    {bgColorOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Box
-                            sx={{
-                              width: 20,
-                              height: 20,
-                              bgcolor: option.value,
-                              border: '1px solid #ccc',
-                              borderRadius: 0.5,
-                            }}
-                          />
-                          <Typography>{option.label}</Typography>
-                        </Stack>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                  Transparent areas will be replaced with this color (JPG doesn't support transparency)
-                </Typography>
-              </Box>
-
-              {convertedUrl && (
-                <Box sx={{ p: 2, bgcolor: 'primary.light', borderRadius: 1 }}>
-                  <Typography variant="h6" color="primary.dark" gutterBottom>
-                    ✓ Conversion Complete
-                  </Typography>
-                  <Stack spacing={0.5}>
-                    <Typography variant="body2">
-                      Original (AVIF): {formatFileSize(originalSize)}
-                    </Typography>
-                    <Typography variant="body2">
-                      Converted (JPG): {formatFileSize(convertedSize)}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      File size {sizeDiff > 0 ? 'increased' : 'decreased'} by {Math.abs(sizeDiff)}%
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                      JPG format provides maximum compatibility at {quality}% quality
-                    </Typography>
-                  </Stack>
-                </Box>
-              )}
-
-              <Alert severity="info">
-                <Typography variant="body2" gutterBottom>
-                  <strong>AVIF to JPG Conversion:</strong>
-                </Typography>
-                <Typography variant="caption" component="div">
-                  • <strong>Universal Compatibility:</strong> JPG works on all devices and browsers<br/>
-                  • <strong>Legacy Support:</strong> Compatible with older systems (pre-2020)<br/>
-                  • <strong>Email & Print:</strong> Most services require JPG/JPEG format<br/>
-                  • <strong>Trade-off:</strong> Larger file size but broader compatibility
-                </Typography>
-              </Alert>
-
-              <Alert severity="warning">
-                <Typography variant="body2">
-                  <strong>Browser Support Note:</strong> AVIF decoding requires a modern browser 
-                  (Chrome 85+, Firefox 93+, Safari 16+). If you can't view AVIF files, update your 
-                  browser. This converter helps you share images with users on older systems.
-                </Typography>
-              </Alert>
-            </Stack>
+          <Box sx={{ textAlign: 'center', bgcolor: 'action.hover', borderRadius: 1, p: 1 }}>
+            <img src={outUrl || originalUrl!} alt="preview" style={{ maxWidth: '100%', maxHeight: 460, objectFit: 'contain' }} />
+          </Box>
+          <Card sx={{ p: { xs: 2, sm: 3 } }}>
+            <Box>
+              <Typography variant="body2">JPG Quality: {quality}%</Typography>
+              <Slider value={quality} min={50} max={100} onChange={(_, v) => setQuality(v as number)} />
+            </Box>
+            {outUrl && <Alert severity="success" sx={{ mt: 1 }}>Converted size: <strong>{formatBytes(outSize)}</strong></Alert>}
           </Card>
-
-          <Stack direction="row" spacing={2}>
-            <Button variant="outlined" onClick={reset} fullWidth>
-              Reset
-            </Button>
-            <Button
-              variant="contained"
-              onClick={convertImage}
-              disabled={processing}
-              fullWidth
-            >
-              {processing ? 'Converting...' : 'Convert to JPG'}
-            </Button>
-            {convertedUrl && (
-              <Button variant="contained" color="success" onClick={downloadImage} fullWidth>
-                Download JPG
-              </Button>
-            )}
-          </Stack>
+          <ActionButtons onReset={reset} onProcess={apply} onDownload={download} processing={processing} processed={!!outUrl} />
         </Stack>
       )}
     </ToolLayout>

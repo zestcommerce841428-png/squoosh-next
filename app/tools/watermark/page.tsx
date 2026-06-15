@@ -1,219 +1,159 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, Stack, Alert, Typography, TextField, Slider, Box, ToggleButtonGroup, ToggleButton, Button } from '@mui/material';
-import { ToolLayout, UploadArea, PreviewArea, ActionButtons } from '@/components/ToolComponents';
+import { useState, useRef } from 'react';
+import {
+  Card, Stack, Alert, Typography, TextField, Box, Slider, FormControlLabel,
+  Switch, Select, MenuItem, InputLabel, FormControl,
+} from '@mui/material';
+import { ToolLayout, UploadArea, ActionButtons } from '@/components/ToolComponents';
+
+type Pos = 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 export default function WatermarkPage() {
   const [file, setFile] = useState<File | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
-  const [watermarkedUrl, setWatermarkedUrl] = useState<string | null>(null);
+  const [outUrl, setOutUrl] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const [watermarkText, setWatermarkText] = useState<string>('© Your Name');
-  const [position, setPosition] = useState<string>('bottom-right');
-  const [opacity, setOpacity] = useState<number>(50);
-  const [fontSize, setFontSize] = useState<number>(32);
-  const [fontColor, setFontColor] = useState<string>('#FFFFFF');
 
-  const handleFileSelect = (selectedFile: File) => {
-    setFile(selectedFile);
-    const url = URL.createObjectURL(selectedFile);
-    setOriginalUrl(url);
-    setWatermarkedUrl(null);
+  const [text, setText] = useState('© Your Brand');
+  const [opacity, setOpacity] = useState(40);
+  const [size, setSize] = useState(5);
+  const [color, setColor] = useState('#ffffff');
+  const [position, setPosition] = useState<Pos>('bottom-right');
+  const [tiled, setTiled] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const handleFileSelect = (f: File) => {
+    if (!f.type.startsWith('image/')) { setError('Please choose an image.'); return; }
+    setFile(f);
+    setOriginalUrl(URL.createObjectURL(f));
+    setOutUrl(null);
     setError(null);
   };
 
-  const applyWatermark = async () => {
-    if (!file || !originalUrl || !watermarkText) return;
-
+  const apply = async () => {
+    if (!file || !originalUrl) return;
     setProcessing(true);
     setError(null);
-
     try {
       const img = new Image();
       img.src = originalUrl;
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
 
-      const canvas = document.createElement('canvas');
+      const canvas = canvasRef.current ?? document.createElement('canvas');
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(img, 0, 0);
 
-      // Configure watermark text
-      ctx.font = `${fontSize}px Arial`;
-      ctx.fillStyle = fontColor;
+      const fontSize = Math.max(12, (size / 100) * img.width);
+      ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+      ctx.fillStyle = color;
       ctx.globalAlpha = opacity / 100;
+      ctx.shadowColor = 'rgba(0,0,0,0.4)';
+      ctx.shadowBlur = fontSize / 8;
 
-      const textMetrics = ctx.measureText(watermarkText);
-      const textWidth = textMetrics.width;
-      const textHeight = fontSize;
-      const padding = 20;
-
-      let x: number, y: number;
-
-      switch (position) {
-        case 'top-left':
-          x = padding;
-          y = padding + textHeight;
-          break;
-        case 'top-center':
-          x = (canvas.width - textWidth) / 2;
-          y = padding + textHeight;
-          break;
-        case 'top-right':
-          x = canvas.width - textWidth - padding;
-          y = padding + textHeight;
-          break;
-        case 'center':
-          x = (canvas.width - textWidth) / 2;
-          y = (canvas.height + textHeight) / 2;
-          break;
-        case 'bottom-left':
-          x = padding;
-          y = canvas.height - padding;
-          break;
-        case 'bottom-center':
-          x = (canvas.width - textWidth) / 2;
-          y = canvas.height - padding;
-          break;
-        case 'bottom-right':
-        default:
-          x = canvas.width - textWidth - padding;
-          y = canvas.height - padding;
-          break;
+      if (tiled) {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const metrics = ctx.measureText(text);
+        const stepX = metrics.width + fontSize * 2;
+        const stepY = fontSize * 3;
+        ctx.save();
+        ctx.translate(img.width / 2, img.height / 2);
+        ctx.rotate(-Math.PI / 6);
+        for (let y = -img.height; y < img.height; y += stepY) {
+          for (let x = -img.width; x < img.width; x += stepX) {
+            ctx.fillText(text, x, y);
+          }
+        }
+        ctx.restore();
+      } else {
+        const pad = fontSize * 0.5;
+        const metrics = ctx.measureText(text);
+        let x = pad, y = pad + fontSize;
+        ctx.textBaseline = 'alphabetic';
+        if (position.includes('right')) x = img.width - metrics.width - pad;
+        if (position.includes('bottom')) y = img.height - pad;
+        if (position === 'center') { x = (img.width - metrics.width) / 2; y = img.height / 2; }
+        ctx.fillText(text, x, y);
       }
+      ctx.globalAlpha = 1;
 
-      ctx.fillText(watermarkText, x, y);
-
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), file.type || 'image/png', 0.95);
-      });
-
-      const url = URL.createObjectURL(blob);
-      setWatermarkedUrl(url);
-    } catch (err) {
-      setError('Watermark application failed. Please try another image.');
+      const blob = await new Promise<Blob>((r) => canvas.toBlob((b) => r(b!), 'image/png'));
+      setOutUrl(URL.createObjectURL(blob));
+    } catch {
+      setError('Failed to apply watermark.');
     } finally {
       setProcessing(false);
     }
   };
 
-  const downloadImage = () => {
-    if (!watermarkedUrl || !file) return;
+  const download = () => {
+    if (!outUrl || !file) return;
     const a = document.createElement('a');
-    a.href = watermarkedUrl;
-    a.download = file.name.replace(/(\.[^.]+)$/, '-watermarked$1');
-    document.body.appendChild(a);
+    a.href = outUrl;
+    a.download = file.name.replace(/\.[^.]+$/, '-watermarked.png');
     a.click();
-    document.body.removeChild(a);
   };
 
   const reset = () => {
-    setFile(null);
-    setOriginalUrl(null);
-    setWatermarkedUrl(null);
-    setError(null);
+    setFile(null); setOriginalUrl(null); setOutUrl(null); setError(null);
   };
 
   return (
     <ToolLayout
       title="Watermark Tool"
-      description="Add text or image watermarks to protect your images with custom positioning and opacity"
-      features={['Text Watermark', '9 Positions', 'Custom Opacity', 'Batch Support']}
+      description="Add a text watermark to your images — single placement or tiled across the whole image. Runs entirely in your browser."
+      features={['Text Watermark', 'Tiled Mode', 'Opacity & Color', 'No Upload']}
     >
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
       {!file ? (
         <UploadArea onFileSelect={handleFileSelect} />
       ) : (
         <Stack spacing={3}>
-          <PreviewArea imageUrl={watermarkedUrl || originalUrl} />
+          <Box sx={{ width: '100%', textAlign: 'center', bgcolor: 'action.hover', borderRadius: 1, p: 1 }}>
+            <img
+              src={outUrl || originalUrl!}
+              alt={outUrl ? 'Watermarked' : 'Original'}
+              style={{ maxWidth: '100%', maxHeight: 480, objectFit: 'contain' }}
+            />
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
+          </Box>
 
-          <Card sx={{ p: 3 }}>
-            <Stack spacing={3}>
-              <TextField
-                label="Watermark Text"
-                value={watermarkText}
-                onChange={(e) => setWatermarkText(e.target.value)}
-                fullWidth
-                placeholder="© Your Name"
-              />
-
+          <Card sx={{ p: { xs: 2, sm: 3 } }}>
+            <Stack spacing={2.5}>
+              <TextField label="Watermark Text" fullWidth value={text} onChange={(e) => setText(e.target.value)} />
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <FormControl fullWidth disabled={tiled}>
+                  <InputLabel>Position</InputLabel>
+                  <Select value={position} label="Position" onChange={(e) => setPosition(e.target.value as Pos)}>
+                    <MenuItem value="center">Center</MenuItem>
+                    <MenuItem value="top-left">Top Left</MenuItem>
+                    <MenuItem value="top-right">Top Right</MenuItem>
+                    <MenuItem value="bottom-left">Bottom Left</MenuItem>
+                    <MenuItem value="bottom-right">Bottom Right</MenuItem>
+                  </Select>
+                </FormControl>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2">Color</Typography>
+                  <input aria-label="Watermark color" type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ width: 48, height: 40, border: 'none', background: 'none' }} />
+                </Box>
+              </Stack>
               <Box>
-                <Typography variant="subtitle2" gutterBottom>Position</Typography>
-                <ToggleButtonGroup
-                  value={position}
-                  exclusive
-                  onChange={(e, val) => val && setPosition(val)}
-                  fullWidth
-                  sx={{ flexWrap: 'wrap' }}
-                >
-                  <ToggleButton value="top-left" sx={{ flex: '1 1 30%' }}>↖ Top Left</ToggleButton>
-                  <ToggleButton value="top-center" sx={{ flex: '1 1 30%' }}>↑ Top Center</ToggleButton>
-                  <ToggleButton value="top-right" sx={{ flex: '1 1 30%' }}>↗ Top Right</ToggleButton>
-                  <ToggleButton value="center" sx={{ flex: '1 1 30%' }}>• Center</ToggleButton>
-                  <ToggleButton value="bottom-left" sx={{ flex: '1 1 30%' }}>↙ Bottom Left</ToggleButton>
-                  <ToggleButton value="bottom-center" sx={{ flex: '1 1 30%' }}>↓ Bottom Center</ToggleButton>
-                  <ToggleButton value="bottom-right" sx={{ flex: '1 1 30%' }}>↘ Bottom Right</ToggleButton>
-                </ToggleButtonGroup>
+                <Typography variant="body2">Opacity: {opacity}%</Typography>
+                <Slider value={opacity} min={5} max={100} onChange={(_, v) => setOpacity(v as number)} />
               </Box>
-
               <Box>
-                <Typography variant="body2" gutterBottom>
-                  Opacity: {opacity}%
-                </Typography>
-                <Slider
-                  value={opacity}
-                  onChange={(e, val) => setOpacity(val as number)}
-                  min={10}
-                  max={100}
-                  valueLabelDisplay="auto"
-                />
+                <Typography variant="body2">Text Size: {size}%</Typography>
+                <Slider value={size} min={2} max={20} onChange={(_, v) => setSize(v as number)} />
               </Box>
-
-              <Box>
-                <Typography variant="body2" gutterBottom>
-                  Font Size: {fontSize}px
-                </Typography>
-                <Slider
-                  value={fontSize}
-                  onChange={(e, val) => setFontSize(val as number)}
-                  min={16}
-                  max={120}
-                  valueLabelDisplay="auto"
-                />
-              </Box>
-
-              <Box>
-                <Typography variant="body2" gutterBottom>
-                  Text Color
-                </Typography>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <input
-                    type="color"
-                    value={fontColor}
-                    onChange={(e) => setFontColor(e.target.value)}
-                    style={{ width: 60, height: 40, cursor: 'pointer', border: 'none' }}
-                  />
-                  <Typography variant="body2">{fontColor}</Typography>
-                </Stack>
-              </Box>
+              <FormControlLabel control={<Switch checked={tiled} onChange={(e) => setTiled(e.target.checked)} />} label="Tile across entire image" />
             </Stack>
           </Card>
 
-          <ActionButtons
-            onReset={reset}
-            onProcess={applyWatermark}
-            onDownload={downloadImage}
-            processing={processing}
-            processed={!!watermarkedUrl}
-          />
+          <ActionButtons onReset={reset} onProcess={apply} onDownload={download} processing={processing} processed={!!outUrl} />
         </Stack>
       )}
     </ToolLayout>

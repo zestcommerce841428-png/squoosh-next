@@ -7,6 +7,7 @@ import FloatingDashboard from 'components/FloatingDashboard';
 import { Box } from '@mui/material';
 import Script from 'next/script';
 import { LanguageProvider } from '../lib/i18n';
+import { AuthProvider } from '../lib/supabase/AuthProvider';
 import './globals.css';
 
 // Environment variable for Google Analytics
@@ -188,16 +189,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         <AppRouterCacheProvider options={{ key: 'css', enableCssLayer: true }}>
           <ThemeRegistry>
-            <LanguageProvider>
-              <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
-                <Header />
-                <Box component="main" sx={{ flexGrow: 1 }}>
-                  {children}
+            <AuthProvider>
+              <LanguageProvider>
+                <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+                  <Header />
+                  <Box component="main" sx={{ flexGrow: 1 }}>
+                    {children}
+                  </Box>
+                  <Footer />
+                  <FloatingDashboard />
                 </Box>
-                <Footer />
-                <FloatingDashboard />
-              </Box>
-            </LanguageProvider>
+              </LanguageProvider>
+            </AuthProvider>
           </ThemeRegistry>
         </AppRouterCacheProvider>
       </body>

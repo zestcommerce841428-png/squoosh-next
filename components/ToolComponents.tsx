@@ -1,10 +1,12 @@
 /**
  * Reusable Tool Component Library
- * Shared components for all 31 image tools
+ * Shared components for all image tools
  */
+'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { Box, Button, Container, Typography, Paper, Stack, Chip } from '@mui/material';
+import { executeReCaptcha } from '@/lib/recaptcha';
 
 interface ToolLayoutProps {
   title: string;
@@ -14,14 +16,23 @@ interface ToolLayoutProps {
 }
 
 export function ToolLayout({ title, description, features, children }: ToolLayoutProps) {
+  // Passive reCAPTCHA v3 scoring for every tool page (no-op until keys are set).
+  useEffect(() => {
+    const action = 'tool_' + title.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    executeReCaptcha(action).catch(() => {});
+  }, [title]);
+
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1.5, sm: 3 } }}>
       {/* Header */}
-      <Box sx={{ mb: 4, textAlign: 'center' }}>
+      <Box sx={{ mb: { xs: 3, md: 4 }, textAlign: 'center' }}>
         <Typography
           variant="h3"
+          component="h1"
           sx={{
             fontWeight: 800,
+            fontSize: { xs: '1.6rem', sm: '2.2rem', md: '3rem' },
+            lineHeight: 1.15,
             background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -30,12 +41,16 @@ export function ToolLayout({ title, description, features, children }: ToolLayou
         >
           {title}
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto', mb: 2 }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ maxWidth: 700, mx: 'auto', mb: 2, fontSize: { xs: '0.9rem', sm: '1rem' }, px: { xs: 1, sm: 0 } }}
+        >
           {description}
         </Typography>
-        <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
+        <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" useFlexGap>
           {features.map((feature, i) => (
-            <Chip key={i} label={`✓ ${feature}`} size="small" />
+            <Chip key={i} label={`✓ ${feature}`} size="small" sx={{ mb: 0.5 }} />
           ))}
         </Stack>
       </Box>
@@ -69,11 +84,12 @@ export function UploadArea({ onFileSelect, accept = 'image/*', maxSize = 10 }: U
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
       sx={{
-        p: 6,
+        p: { xs: 3, sm: 4, md: 6 },
         textAlign: 'center',
         border: '2px dashed',
         borderColor: 'divider',
         cursor: 'pointer',
+        transition: 'border-color .2s, background-color .2s',
         '&:hover': { borderColor: 'primary.main', bgcolor: 'action.hover' },
       }}
     >
@@ -109,15 +125,15 @@ interface PreviewAreaProps {
   height?: number;
 }
 
-export function PreviewArea({ imageUrl, height = 500 }: PreviewAreaProps) {
+export function PreviewArea({ imageUrl, height }: PreviewAreaProps) {
   if (!imageUrl) return null;
 
   return (
-    <Paper sx={{ p: 2 }}>
+    <Paper sx={{ p: { xs: 1, sm: 2 } }}>
       <Box
         sx={{
           width: '100%',
-          height,
+          height: height ?? { xs: 260, sm: 380, md: 500 },
           bgcolor: 'action.hover',
           borderRadius: 1,
           overflow: 'hidden',
