@@ -9,6 +9,7 @@ import {
 import { useColorMode } from './ThemeRegistry';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useAuth } from '../lib/supabase/AuthProvider';
+import { useLanguage } from '../lib/i18n';
 
 const SunIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -38,18 +39,20 @@ const MenuIcon = () => (
   </svg>
 );
 
-const NAV_LINKS = [
-  { href: '/compress', label: 'Workspace' },
-  { href: '/features', label: 'Features' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
+const NAV_LINKS: { href: string; key: 'nav.compress' | 'nav.features' | 'nav.about' | 'nav.contact' | null; fallback: string }[] = [
+  { href: '/compress', key: 'nav.compress', fallback: 'Workspace' },
+  { href: '/features', key: 'nav.features', fallback: 'Features' },
+  { href: '/blog', key: null, fallback: 'Blog' },
+  { href: '/about', key: 'nav.about', fallback: 'About' },
+  { href: '/contact', key: 'nav.contact', fallback: 'Contact' },
 ];
 
 export default function Header() {
   const { mode, toggleColorMode } = useColorMode();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const label = (l: typeof NAV_LINKS[number]) => (l.key ? t(l.key) : l.fallback);
   const accountHref = user ? '/profile' : '/auth/login';
   const accountLabel = user ? 'Profile' : 'Sign in';
 
@@ -79,7 +82,7 @@ export default function Header() {
           <Stack direction="row" spacing={{ xs: 1, md: 3 }} sx={{ display: { xs: 'none', md: 'flex' } }}>
             {NAV_LINKS.map((l) => (
               <Button key={l.href} component={Link} href={l.href} sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                {l.label}
+                {label(l)}
               </Button>
             ))}
           </Stack>
@@ -137,7 +140,7 @@ export default function Header() {
             {NAV_LINKS.map((l) => (
               <ListItem key={l.href} disablePadding>
                 <ListItemButton component={Link} href={l.href}>
-                  <ListItemText primary={l.label} />
+                  <ListItemText primary={label(l)} />
                 </ListItemButton>
               </ListItem>
             ))}

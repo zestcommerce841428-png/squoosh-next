@@ -6,30 +6,31 @@ import {
   Container, Card, Stack, TextField, Button, Typography, Alert, Box, Avatar, Divider,
   CircularProgress, Switch, FormControlLabel, Dialog, DialogTitle, DialogContent,
   DialogActions, Tabs, Tab, IconButton, MenuItem, LinearProgress, Chip, Snackbar,
+  InputAdornment,
 } from '@mui/material';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 
 type Profile = Record<string, any>;
 
-interface FieldDef { key: string; label: string; type?: string; select?: string[]; full?: boolean; multiline?: boolean; }
+interface FieldDef { key: string; label: string; type?: string; select?: string[]; full?: boolean; multiline?: boolean; prefix?: string; placeholder?: string; }
 
-const GROUPS: { id: string; label: string; icon: string; fields: FieldDef[] }[] = [
+const GROUPS: { id: string; label: string; icon: string; desc: string; fields: FieldDef[] }[] = [
   {
-    id: 'personal', label: 'Personal', icon: '👤',
+    id: 'personal', label: 'Personal', icon: '👤', desc: 'Your basic identity and how your name appears across the app.',
     fields: [
       { key: 'first_name', label: 'First name' },
       { key: 'last_name', label: 'Last name' },
       { key: 'display_name', label: 'Display name' },
-      { key: 'username', label: 'Username' },
-      { key: 'phone', label: 'Phone' },
+      { key: 'username', label: 'Username', prefix: '@' },
+      { key: 'phone', label: 'Phone', type: 'tel', placeholder: '+91 98765 43210' },
       { key: 'date_of_birth', label: 'Date of birth', type: 'date' },
       { key: 'gender', label: 'Gender', select: ['', 'Male', 'Female', 'Non-binary', 'Prefer not to say'] },
-      { key: 'bio', label: 'Bio', full: true, multiline: true },
+      { key: 'bio', label: 'Bio', full: true, multiline: true, placeholder: 'A short line about yourself' },
     ],
   },
   {
-    id: 'address', label: 'Address', icon: '📍',
+    id: 'address', label: 'Address', icon: '📍', desc: 'Used for billing, invoices and regional defaults. Kept private.',
     fields: [
       { key: 'address_line1', label: 'Address line 1', full: true },
       { key: 'address_line2', label: 'Address line 2', full: true },
@@ -40,27 +41,27 @@ const GROUPS: { id: string; label: string; icon: string; fields: FieldDef[] }[] 
     ],
   },
   {
-    id: 'work', label: 'Professional', icon: '💼',
+    id: 'work', label: 'Professional', icon: '💼', desc: 'Where you work and your public website.',
     fields: [
       { key: 'company', label: 'Company' },
       { key: 'job_title', label: 'Job title' },
-      { key: 'website', label: 'Website', full: true },
+      { key: 'website', label: 'Website', full: true, prefix: '🌐', placeholder: 'https://example.com' },
     ],
   },
   {
-    id: 'social', label: 'Social', icon: '🔗',
+    id: 'social', label: 'Social', icon: '🔗', desc: 'Add just your handle/username — not the full URL.',
     fields: [
-      { key: 'twitter', label: 'Twitter / X' },
-      { key: 'github', label: 'GitHub' },
-      { key: 'linkedin', label: 'LinkedIn' },
-      { key: 'instagram', label: 'Instagram' },
+      { key: 'twitter', label: 'Twitter / X', prefix: '@' },
+      { key: 'github', label: 'GitHub', prefix: '@' },
+      { key: 'linkedin', label: 'LinkedIn', prefix: 'in/' },
+      { key: 'instagram', label: 'Instagram', prefix: '@' },
     ],
   },
   {
-    id: 'prefs', label: 'Preferences', icon: '⚙️',
+    id: 'prefs', label: 'Preferences', icon: '⚙️', desc: 'Language, timezone and how you want to hear from us.',
     fields: [
       { key: 'language', label: 'Language', select: ['en', 'hi', 'es', 'fr', 'de', 'ar', 'zh'] },
-      { key: 'timezone', label: 'Timezone' },
+      { key: 'timezone', label: 'Timezone', placeholder: 'Asia/Kolkata' },
       { key: 'theme', label: 'Theme', select: ['system', 'light', 'dark'] },
       { key: 'backup_email', label: 'Backup email', type: 'email', full: true },
     ],
@@ -233,18 +234,25 @@ export default function ProfilePage() {
         <Box sx={{ p: { xs: 2, sm: 3 } }}>
           {!securityTab && (
             <>
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+              <Box sx={{ mb: 2.5 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span>{GROUPS[tab].icon}</span> {GROUPS[tab].label}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">{GROUPS[tab].desc}</Typography>
+              </Box>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: { xs: 2, sm: 2.5 } }}>
                 {GROUPS[tab].fields.map((f) => (
                   <TextField
                     key={f.key}
                     label={f.label}
                     fullWidth
-                    size="small"
                     select={!!f.select}
                     multiline={f.multiline}
                     minRows={f.multiline ? 3 : undefined}
                     type={f.type || 'text'}
+                    placeholder={f.placeholder}
                     InputLabelProps={f.type === 'date' ? { shrink: true } : undefined}
+                    slotProps={f.prefix ? { input: { startAdornment: <InputAdornment position="start">{f.prefix}</InputAdornment> } } : undefined}
                     value={profile[f.key] ?? ''}
                     onChange={(e) => set(f.key, e.target.value)}
                     sx={{ gridColumn: f.full ? { sm: '1 / -1' } : undefined }}

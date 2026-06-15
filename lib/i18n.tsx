@@ -43,10 +43,13 @@ export interface TranslationKeys {
   'tools.aiFeatures': string;
 }
 
-type Language = 'en' | 'es' | 'fr' | 'de' | 'zh' | 'ja' | 'ko' | 'hi' | 'ar' | 'pt';
+export type Language = 'en' | 'es' | 'fr' | 'de' | 'zh' | 'ja' | 'ko' | 'hi' | 'ar' | 'pt';
+
+const RTL_LANGS: Language[] = ['ar'];
 
 interface LanguageContextType {
   language: Language;
+  dir: 'ltr' | 'rtl';
   setLanguage: (lang: Language) => void;
   t: (key: keyof TranslationKeys) => string;
 }
@@ -130,6 +133,9 @@ const translations: Record<Language, Partial<TranslationKeys>> = {
     'nav.home': 'Accueil',
     'nav.features': 'Fonctionnalités',
     'nav.tools': 'Outils',
+    'nav.compress': 'Compresser',
+    'nav.about': 'À propos',
+    'nav.contact': 'Contact',
   },
   de: {
     'common.loading': 'Laden...',
@@ -139,6 +145,9 @@ const translations: Record<Language, Partial<TranslationKeys>> = {
     'nav.home': 'Startseite',
     'nav.features': 'Funktionen',
     'nav.tools': 'Werkzeuge',
+    'nav.compress': 'Komprimieren',
+    'nav.about': 'Über uns',
+    'nav.contact': 'Kontakt',
   },
   zh: {
     'common.loading': '加载中...',
@@ -148,6 +157,9 @@ const translations: Record<Language, Partial<TranslationKeys>> = {
     'nav.home': '首页',
     'nav.features': '功能',
     'nav.tools': '工具',
+    'nav.compress': '压缩',
+    'nav.about': '关于',
+    'nav.contact': '联系',
   },
   ja: {
     'common.loading': '読み込み中...',
@@ -157,6 +169,9 @@ const translations: Record<Language, Partial<TranslationKeys>> = {
     'nav.home': 'ホーム',
     'nav.features': '機能',
     'nav.tools': 'ツール',
+    'nav.compress': '圧縮',
+    'nav.about': '会社概要',
+    'nav.contact': 'お問い合わせ',
   },
   ko: {
     'common.loading': '로딩 중...',
@@ -166,6 +181,9 @@ const translations: Record<Language, Partial<TranslationKeys>> = {
     'nav.home': '홈',
     'nav.features': '기능',
     'nav.tools': '도구',
+    'nav.compress': '압축',
+    'nav.about': '소개',
+    'nav.contact': '문의',
   },
   hi: {
     'common.loading': 'लोड हो रहा है...',
@@ -175,6 +193,9 @@ const translations: Record<Language, Partial<TranslationKeys>> = {
     'nav.home': 'होम',
     'nav.features': 'विशेषताएँ',
     'nav.tools': 'उपकरण',
+    'nav.compress': 'कंप्रेस',
+    'nav.about': 'हमारे बारे में',
+    'nav.contact': 'संपर्क करें',
   },
   ar: {
     'common.loading': 'جاري التحميل...',
@@ -184,6 +205,9 @@ const translations: Record<Language, Partial<TranslationKeys>> = {
     'nav.home': 'الرئيسية',
     'nav.features': 'الميزات',
     'nav.tools': 'الأدوات',
+    'nav.compress': 'ضغط',
+    'nav.about': 'من نحن',
+    'nav.contact': 'اتصل بنا',
   },
   pt: {
     'common.loading': 'Carregando...',
@@ -193,24 +217,33 @@ const translations: Record<Language, Partial<TranslationKeys>> = {
     'nav.home': 'Início',
     'nav.features': 'Recursos',
     'nav.tools': 'Ferramentas',
+    'nav.compress': 'Comprimir',
+    'nav.about': 'Sobre',
+    'nav.contact': 'Contato',
   },
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
-  const [mounted, setMounted] = useState(false);
+
+  const applyDir = (lang: Language) => {
+    if (typeof document === 'undefined') return;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = RTL_LANGS.includes(lang) ? 'rtl' : 'ltr';
+  };
 
   useEffect(() => {
-    setMounted(true);
-    // Load saved language from localStorage
-    const savedLang = localStorage.getItem('squoosh-language');
-    if (savedLang && savedLang in translations) {
-      setLanguageState(savedLang as Language);
+    // Load saved language; tolerate old locale-style values like "en-US".
+    const saved = localStorage.getItem('squoosh-language');
+    const savedBase = saved ? (saved.split('-')[0] as Language) : null;
+    if (savedBase && savedBase in translations) {
+      setLanguageState(savedBase);
+      applyDir(savedBase);
     } else {
-      // Auto-detect browser language
       const browserLang = navigator.language.split('-')[0] as Language;
       if (browserLang in translations) {
         setLanguageState(browserLang);
+        applyDir(browserLang);
       }
     }
   }, []);
@@ -218,20 +251,18 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('squoosh-language', lang);
-    document.documentElement.lang = lang;
+    applyDir(lang);
   };
+
+  const dir: 'ltr' | 'rtl' = RTL_LANGS.includes(language) ? 'rtl' : 'ltr';
 
   const t = (key: keyof TranslationKeys): string => {
     const langTranslations = translations[language];
     return langTranslations[key] || translations.en[key] || key;
   };
 
-  if (!mounted) {
-    return <>{children}</>;
-  }
-
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, dir, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
