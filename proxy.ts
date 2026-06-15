@@ -6,11 +6,9 @@ import { createServerClient } from '@supabase/ssr';
  * This refreshes the Supabase auth session cookie on every request and
  * guards authenticated-only routes.
  */
-// Authenticated-only areas. All tool routes require sign-in.
-const PROTECTED_PREFIXES = [
-  '/profile', '/dashboard', '/account',
-  '/tools', '/compress', '/batch-compress',
-];
+// Authenticated-only areas. Tool PAGES stay public/indexable (SEO) —
+// the tool ACTIONS (upload/process/download) are gated client-side instead.
+const PROTECTED_PREFIXES = ['/profile', '/dashboard', '/account'];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });

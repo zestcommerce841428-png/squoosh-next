@@ -6,7 +6,28 @@
 
 import { ReactNode, useEffect } from 'react';
 import { Box, Button, Container, Typography, Paper, Stack, Chip } from '@mui/material';
+import { useRouter, usePathname } from 'next/navigation';
 import { executeReCaptcha } from '@/lib/recaptcha';
+import { useAuth } from '@/lib/supabase/AuthProvider';
+
+/**
+ * Soft auth gate: tool pages are public (good for SEO), but performing an
+ * action (upload / process) requires sign-in. Returns a guard that runs the
+ * action when authenticated, otherwise sends the user to login and back.
+ */
+function useActionGuard() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  return (proceed: () => void) => {
+    if (loading) return;
+    if (!user) {
+      router.push(`/auth/login?next=${encodeURIComponent(pathname || '/')}`);
+      return;
+    }
+    proceed();
+  };
+}
 
 interface ToolLayoutProps {
   title: string;
@@ -68,15 +89,17 @@ interface UploadAreaProps {
 }
 
 export function UploadArea({ onFileSelect, accept = 'image/*', maxSize = 10 }: UploadAreaProps) {
+  const guard = useActionGuard();
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file) onFileSelect(file);
+    if (file) guard(() => onFileSelect(file));
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) onFileSelect(file);
+    if (file) guard(() => onFileSelect(file));
   };
 
   return (
@@ -172,6 +195,7 @@ export function ActionButtons({
   processing = false,
   processed = false,
 }: ActionButtonsProps) {
+  const guard = useActionGuard();
   return (
     <Stack direction="row" spacing={2}>
       <Button variant="outlined" onClick={onReset}>
@@ -180,7 +204,7 @@ export function ActionButtons({
       {onProcess && !processed && (
         <Button
           variant="contained"
-          onClick={onProcess}
+          onClick={() => guard(onProcess)}
           disabled={processing}
           sx={{ flexGrow: 1 }}
         >
