@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Container, Card, Stack, TextField, Button, Typography, Alert, Box } from '@mui/material';
+import { Stack, TextField, Button, Alert } from '@mui/material';
 import { createClient } from '@/lib/supabase/client';
+import AuthShell from '@/components/AuthShell';
 
 export default function ForgotPasswordPage() {
   const supabase = createClient();
@@ -23,26 +24,24 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ py: { xs: 4, md: 8 } }}>
-      <Card sx={{ p: { xs: 3, sm: 4 } }}>
-        <Stack spacing={3}>
-          <Box textAlign="center">
-            <Typography variant="h5" sx={{ fontWeight: 800 }}>Reset password</Typography>
-          </Box>
-          {error && <Alert severity="error">{error}</Alert>}
-          {sent ? (
-            <Alert severity="success">If an account exists for {email}, a reset link is on its way.</Alert>
-          ) : (
-            <>
-              <TextField label="Email" type="email" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
-              <Button variant="contained" size="large" onClick={submit} disabled={busy || !email} fullWidth>
-                {busy ? 'Sending…' : 'Send reset link'}
-              </Button>
-            </>
-          )}
-          <Typography variant="body2" textAlign="center"><Link href="/auth/login">Back to sign in</Link></Typography>
-        </Stack>
-      </Card>
-    </Container>
+    <AuthShell
+      title="Reset your password"
+      subtitle="We'll email you a secure reset link"
+      footer={<Link href="/auth/login">Back to sign in</Link>}
+    >
+      <Stack spacing={2.5}>
+        {error && <Alert severity="error">{error}</Alert>}
+        {sent ? (
+          <Alert severity="success">If an account exists for <strong>{email}</strong>, a reset link is on its way.</Alert>
+        ) : (
+          <>
+            <TextField label="Email" type="email" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && email && submit()} />
+            <Button variant="contained" size="large" onClick={submit} disabled={busy || !email} sx={{ py: 1.25, fontWeight: 700 }}>
+              {busy ? 'Sending…' : 'Send reset link'}
+            </Button>
+          </>
+        )}
+      </Stack>
+    </AuthShell>
   );
 }

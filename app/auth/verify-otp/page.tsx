@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Container, Card, Stack, TextField, Button, Typography, Alert, Box, CircularProgress } from '@mui/material';
+import { Stack, TextField, Button, Alert, Box, CircularProgress } from '@mui/material';
+import AuthShell from '@/components/AuthShell';
 
 function VerifyInner() {
   const params = useSearchParams();
@@ -23,33 +25,33 @@ function VerifyInner() {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ py: { xs: 4, md: 8 } }}>
-      <Card sx={{ p: { xs: 3, sm: 4 } }}>
-        <Stack spacing={3}>
-          <Box textAlign="center">
-            <Typography variant="h5" sx={{ fontWeight: 800 }}>Enter your code</Typography>
-            <Typography color="text.secondary" variant="body2">Sent to {email}</Typography>
-          </Box>
-          {error && <Alert severity="error">{error}</Alert>}
-          <TextField
-            label="6-digit code"
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            inputProps={{ inputMode: 'numeric', style: { letterSpacing: 8, textAlign: 'center', fontSize: 24 } }}
-            fullWidth
-          />
-          <Button variant="contained" size="large" onClick={verify} disabled={busy || code.length !== 6} fullWidth>
-            {busy ? 'Verifying…' : 'Verify & sign in'}
-          </Button>
-        </Stack>
-      </Card>
-    </Container>
+    <AuthShell
+      title="Enter your code"
+      subtitle={`We sent a 6-digit code to ${email}`}
+      footer={<Link href="/auth/login">Use a different method</Link>}
+    >
+      <Stack spacing={2.5}>
+        {error && <Alert severity="error">{error}</Alert>}
+        <TextField
+          label="6-digit code"
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+          onKeyDown={(e) => e.key === 'Enter' && code.length === 6 && verify()}
+          inputProps={{ inputMode: 'numeric', style: { letterSpacing: 10, textAlign: 'center', fontSize: 26, fontWeight: 700 } }}
+          fullWidth
+          autoFocus
+        />
+        <Button variant="contained" size="large" onClick={verify} disabled={busy || code.length !== 6} sx={{ py: 1.25, fontWeight: 700 }}>
+          {busy ? 'Verifying…' : 'Verify & sign in'}
+        </Button>
+      </Stack>
+    </AuthShell>
   );
 }
 
 export default function VerifyOtpPage() {
   return (
-    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}><CircularProgress /></Box>}>
+    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}><CircularProgress /></Box>}>
       <VerifyInner />
     </Suspense>
   );
