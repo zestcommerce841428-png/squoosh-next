@@ -100,13 +100,13 @@ export const FEATURES_DATA: FeatureItem[] = [
   // ===== COMING SOON (178 Tools Remaining) =====
   
   // 1. Compression & Optimization (Remaining)
-  { id: 53, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: 'WASM Option', status: 'coming-soon' },
-  { id: 54, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: 'Batch Support', status: 'coming-soon' },
-  { id: 55, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: 'Native File System', status: 'coming-soon' },
-  { id: 56, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
+  { id: 71, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: 'WASM Option', status: 'coming-soon' },
+  { id: 72, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: 'Batch Support', status: 'coming-soon' },
+  { id: 73, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: 'Native File System', status: 'coming-soon' },
+  { id: 74, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
 
   // 2. Format Conversion (Remaining)
-  { id: 57, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: 'TIFF Decoder', status: 'coming-soon' },
+  { id: 75, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: 'TIFF Decoder', status: 'coming-soon' },
 
   // Continue with remaining 189 features...
   // (I'll add key features from each category to reach 230 total)
@@ -134,13 +134,13 @@ export const FEATURES_DATA: FeatureItem[] = [
   { id: 70, category: 'Ecommerce & Seller', name: 'Product Background White', description: 'Force transparent backgrounds to pure white (#FFFFFF) for marketplace compliance.', badge: '✅ LIVE', status: 'live', slug: 'product-white-bg' },
 
   // 4. Ecommerce & Seller Tools (Remaining)
-  { id: 64, category: 'Ecommerce & Seller', name: 'Product Shadow Generator', description: 'Generate realistic drop or contact shadows beneath product subjects.', badge: 'Shadow Render', status: 'coming-soon' },
-  { id: 65, category: 'Ecommerce & Seller', name: 'Product Reflection Generator', description: 'Apply professional mirror reflection effects below commercial items.', badge: 'Mirror FX', status: 'coming-soon' },
+  { id: 76, category: 'Ecommerce & Seller', name: 'Product Shadow Generator', description: 'Generate realistic drop or contact shadows beneath product subjects.', badge: 'Shadow Render', status: 'coming-soon' },
+  { id: 77, category: 'Ecommerce & Seller', name: 'Product Reflection Generator', description: 'Apply professional mirror reflection effects below commercial items.', badge: 'Mirror FX', status: 'coming-soon' },
 
   // 5. Analytics & Quality
-  { id: 66, category: 'Analytics & Quality', name: 'Image Quality Analyzer', description: 'Calculate PSNR (Peak Signal-to-Noise Ratio) and SSIM values.', badge: 'Image Quality', status: 'coming-soon' },
-  { id: 67, category: 'Analytics & Quality', name: 'Compression Savings Calculator', description: 'Live tracker showing exact bytes saved per image.', badge: 'Live Analytics', status: 'coming-soon' },
-  { id: 68, category: 'Analytics & Quality', name: 'Performance Score Report', description: 'Comprehensive audit score based on industry web performance standards.', badge: 'Performance Card', status: 'coming-soon' },
+  { id: 78, category: 'Analytics & Quality', name: 'Image Quality Analyzer', description: 'Calculate PSNR (Peak Signal-to-Noise Ratio) and SSIM values.', badge: 'Image Quality', status: 'coming-soon' },
+  { id: 79, category: 'Analytics & Quality', name: 'Compression Savings Calculator', description: 'Live tracker showing exact bytes saved per image.', badge: 'Live Analytics', status: 'coming-soon' },
+  { id: 80, category: 'Analytics & Quality', name: 'Performance Score Report', description: 'Comprehensive audit score based on industry web performance standards.', badge: 'Performance Card', status: 'coming-soon' },
 
   // Continue pattern for remaining features to reach 230 total
   // Each category should have proportional representation

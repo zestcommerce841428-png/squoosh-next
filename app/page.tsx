@@ -1,13 +1,16 @@
 import Link from 'next/link';
 import { Container, Typography, Box, Button, Grid, Card, Stack, Chip, Paper, Divider } from '@mui/material';
+import { getLiveToolsCount } from './features/features-data';
+
+const LIVE = getLiveToolsCount();
 
 export const metadata = {
   title: 'Squoosh Next — Professional Browser-Native Image Optimizer',
-  description: 'Compress, convert, and edit 100+ image formats entirely in your browser. MozJPEG, WebP, AVIF, OxiPNG, and 230 advanced tools — zero server uploads.',
+  description: `Compress, convert, and edit 100+ image formats entirely in your browser. MozJPEG, WebP, AVIF, OxiPNG, and ${LIVE}+ advanced tools — zero server uploads.`,
 };
 
 const STATS = [
-  { value: '230+', label: 'Catalogued Features' },
+  { value: `${LIVE}+`, label: 'Live Tools' },
   { value: '100+', label: 'Supported Formats' },
   { value: '0 B', label: 'Data Uploaded to Servers' },
   { value: '100%', label: 'Client-Side Processing' },
@@ -101,7 +104,7 @@ export default function HomePage() {
                   — Entirely in Your Browser
                 </Typography>
                 <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400, lineHeight: 1.65, fontSize: '1.1rem' }}>
-                  Compress, convert, resize, and edit with MozJPEG, WebP, AVIF, and OxiPNG codecs. 230 tools. 100+ formats. Zero server uploads — your images never leave your device.
+                  Compress, convert, resize, and edit with MozJPEG, WebP, AVIF, and OxiPNG codecs. {LIVE}+ tools. 100+ formats. Zero server uploads — your images never leave your device.
                 </Typography>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                   <Link href="/compress">
@@ -111,7 +114,7 @@ export default function HomePage() {
                   </Link>
                   <Link href="/features">
                     <Button variant="outlined" color="primary" size="large" sx={{ px: 4, py: 1.5, fontWeight: 700, fontSize: '1rem' }}>
-                      Browse 230 Tools
+                      Browse {LIVE}+ Tools
                     </Button>
                   </Link>
                 </Stack>
@@ -199,7 +202,7 @@ export default function HomePage() {
           <Box sx={{ textAlign: 'center', mt: 5 }}>
             <Link href="/features">
               <Button variant="outlined" size="large" sx={{ fontWeight: 700, px: 5 }}>
-                View All 230 Features →
+                View All {LIVE}+ Features →
               </Button>
             </Link>
           </Box>

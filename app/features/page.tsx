@@ -71,11 +71,11 @@ export default function FeaturesPage() {
           Professional Image Tools Suite
         </Typography>
         <Typography variant="subtitle1" color="text.secondary" sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
-          70 fully functional tools are live now with 160+ advanced features coming soon. All tools run 100% in your browser for complete privacy and security.
+          {getLiveToolsCount()} fully functional tools are live now, with more advanced features coming soon. All tools run 100% in your browser for complete privacy and security.
         </Typography>
         <Stack direction="row" spacing={1.5} justifyContent="center" flexWrap="wrap">
-          <Chip label="✅ 70 Tools Live Now" color="success" sx={{ fontWeight: 700 }} />
-          <Chip label="🚀 160+ Coming Soon" variant="outlined" color="primary" sx={{ fontWeight: 600 }} />
+          <Chip label={`✅ ${getLiveToolsCount()} Tools Live Now`} color="success" sx={{ fontWeight: 700 }} />
+          <Chip label={`🚀 ${getComingSoonCount()} Coming Soon`} variant="outlined" color="primary" sx={{ fontWeight: 600 }} />
           <Chip label="🔒 100% Client-Side & Secure" variant="outlined" color="success" sx={{ fontWeight: 600 }} />
           <Chip label="💯 No Demo - All Functional" variant="outlined" color="info" sx={{ fontWeight: 600 }} />
         </Stack>
