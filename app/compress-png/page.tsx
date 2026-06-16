@@ -1,5 +1,6 @@
 import { Container, Typography, Box } from '@mui/material';
 import ImageCompressor from 'components/ImageCompressor';
+import RequireAuth from 'components/RequireAuth';
 
 export const metadata = {
   title: 'PNG Compressor - Squoosh Next',
@@ -17,7 +18,7 @@ export default function PNGCompressPage() {
           Configure interlacing, custom quantization, and optimization levels to compress lossless PNGs.
         </Typography>
       </Box>
-      <ImageCompressor />
+      <RequireAuth label="the PNG compressor"><ImageCompressor /></RequireAuth>
     </Container>
   );
 }

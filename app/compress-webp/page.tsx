@@ -1,5 +1,6 @@
 import { Container, Typography, Box } from '@mui/material';
 import ImageCompressor from 'components/ImageCompressor';
+import RequireAuth from 'components/RequireAuth';
 
 export const metadata = {
   title: 'WebP Compressor - Squoosh Next',
@@ -17,7 +18,7 @@ export default function WebPCompressPage() {
           Configure alpha transparency channels, effort levels, sharp YUV filters, and lossless compression settings.
         </Typography>
       </Box>
-      <ImageCompressor />
+      <RequireAuth label="the WebP compressor"><ImageCompressor /></RequireAuth>
     </Container>
   );
 }

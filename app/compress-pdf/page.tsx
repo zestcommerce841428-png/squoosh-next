@@ -1,5 +1,6 @@
 import { Container, Typography, Box } from '@mui/material';
 import ImageCompressor from 'components/ImageCompressor';
+import RequireAuth from 'components/RequireAuth';
 
 export const metadata = {
   title: 'PDF Compressor - Squoosh Next',
@@ -17,7 +18,7 @@ export default function PDFCompressPage() {
           Extract, scale, and optimize PDF pages into high-fidelity web images client-side.
         </Typography>
       </Box>
-      <ImageCompressor />
+      <RequireAuth label="the PDF compressor"><ImageCompressor /></RequireAuth>
     </Container>
   );
 }

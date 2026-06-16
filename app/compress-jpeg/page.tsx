@@ -1,5 +1,6 @@
 import { Container, Typography, Box } from '@mui/material';
 import ImageCompressor from 'components/ImageCompressor';
+import RequireAuth from 'components/RequireAuth';
 
 export const metadata = {
   title: 'JPEG Compressor - Squoosh Next',
@@ -17,7 +18,7 @@ export default function JPEGCompressPage() {
           Configure progressive rendering, trellis quantization, and custom subsampling to output optimal JPEGs.
         </Typography>
       </Box>
-      <ImageCompressor />
+      <RequireAuth label="the JPEG compressor"><ImageCompressor /></RequireAuth>
     </Container>
   );
 }

@@ -1,5 +1,6 @@
 import { Container, Typography, Box } from '@mui/material';
 import ImageCompressor from 'components/ImageCompressor';
+import RequireAuth from 'components/RequireAuth';
 
 export const metadata = {
   title: 'Batch Image Compressor - Squoosh Next',
@@ -17,7 +18,7 @@ export default function BatchCompressPage() {
           Import multiple files at once. Configure shared formatting presets and download compressed outputs concurrently.
         </Typography>
       </Box>
-      <ImageCompressor />
+      <RequireAuth label="batch compression"><ImageCompressor /></RequireAuth>
     </Container>
   );
 }
