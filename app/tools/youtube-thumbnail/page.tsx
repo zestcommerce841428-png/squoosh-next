@@ -1,143 +1,99 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Stack, Alert, Typography, TextField, Button } from '@mui/material';
-import { ToolLayout, UploadArea } from '@/components/ToolComponents';
+import { usePathname, useRouter } from 'next/navigation';
+import { Card, Stack, Alert, Typography, Box, TextField, Button } from '@mui/material';
+import { ToolLayout } from '@/components/ToolComponents';
+import { useAuth } from '@/lib/supabase/AuthProvider';
 
-export default function YouTubeThumbnailPage() {
-  const [file, setFile] = useState<File | null>(null);
-  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
+const RES = [
+  { key: 'maxresdefault', label: 'Max (1280×720)' },
+  { key: 'sddefault', label: 'SD (640×480)' },
+  { key: 'hqdefault', label: 'HQ (480×360)' },
+  { key: 'mqdefault', label: 'Medium (320×180)' },
+];
+
+function extractId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([\w-]{11})/,
+    /^([\w-]{11})$/,
+  ];
+  for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
+  return null;
+}
+
+export default function YoutubeThumbnailPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [url, setUrl] = useState('');
+  const [videoId, setVideoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [title, setTitle] = useState<string>('');
 
-  const handleFileSelect = (selectedFile: File) => {
-    setFile(selectedFile);
-    const url = URL.createObjectURL(selectedFile);
-    setOriginalUrl(url);
-    setThumbnailUrl(null);
-    setError(null);
+  const grab = () => {
+    const id = extractId(url.trim());
+    if (!id) { setError('Could not find a YouTube video ID in that URL.'); setVideoId(null); return; }
+    setError(null); setVideoId(id);
   };
 
-  const createThumbnail = async () => {
-    if (!file || !originalUrl) return;
-
-    setProcessing(true);
-    setError(null);
-
+  const download = async (resKey: string) => {
+    if (loading) return;
+    if (!user) { router.push(`/auth/login?next=${encodeURIComponent(pathname || '/')}`); return; }
+    const src = `https://img.youtube.com/vi/${videoId}/${resKey}.jpg`;
     try {
-      const img = new Image();
-      img.src = originalUrl;
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
-
-      const canvas = document.createElement('canvas');
-      canvas.width = 1280;
-      canvas.height = 720;
-      const ctx = canvas.getContext('2d')!;
-
-      const scale = Math.max(1280 / img.width, 720 / img.height);
-      const scaledWidth = img.width * scale;
-      const scaledHeight = img.height * scale;
-      const x = (1280 - scaledWidth) / 2;
-      const y = (720 - scaledHeight) / 2;
-
-      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-
-      if (title) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 550, 1280, 170);
-        
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 64px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(title.substring(0, 20), 640, 650);
-      }
-
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.95);
-      });
-
-      const url = URL.createObjectURL(blob);
-      setThumbnailUrl(url);
-    } catch (err) {
-      setError('Thumbnail creation failed.');
-    } finally {
-      setProcessing(false);
+      const res = await fetch(src);
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${videoId}-${resKey}.jpg`;
+      a.click();
+    } catch {
+      window.open(src, '_blank');
     }
-  };
-
-  const downloadThumbnail = () => {
-    if (!thumbnailUrl) return;
-    const a = document.createElement('a');
-    a.href = thumbnailUrl;
-    a.download = 'youtube-thumbnail-1280x720.jpg';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const reset = () => {
-    setFile(null);
-    setOriginalUrl(null);
-    setThumbnailUrl(null);
-    setError(null);
-    setTitle('');
   };
 
   return (
     <ToolLayout
-      title="YouTube Thumbnail Maker"
-      description="Create eye-catching 1280×720 YouTube thumbnails with text overlays"
-      features={['1280×720', 'Text Overlay', 'High Quality', 'Instant Export']}
+      title="YouTube Thumbnail Downloader"
+      description="Paste any YouTube link to grab its thumbnail in every available resolution. Fast and free."
+      features={['All Resolutions', 'Shorts & Embeds', 'One-Click Download', 'Instant']}
     >
-      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
-      {!file ? (
-        <UploadArea onFileSelect={handleFileSelect} />
-      ) : (
-        <Stack spacing={3}>
-          {thumbnailUrl ? (
-            <Card sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>YouTube Thumbnail (1280×720)</Typography>
-              <img src={thumbnailUrl} alt="Thumbnail" style={{ width: '100%', height: 'auto' }} />
-            </Card>
-          ) : originalUrl ? (
-            <Card sx={{ p: 2 }}>
-              <img src={originalUrl} alt="Original" style={{ width: '100%', height: 'auto' }} />
-            </Card>
-          ) : null}
-
-          <Card sx={{ p: 3 }}>
+      <Stack spacing={3} sx={{ maxWidth: 820, mx: 'auto' }}>
+        {error && <Alert severity="error">{error}</Alert>}
+        <Card sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
-              label="Title (Optional)"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
               fullWidth
-              placeholder="Add video title..."
-              helperText="Will appear at the bottom"
+              label="YouTube URL"
+              placeholder="https://www.youtube.com/watch?v=…"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && grab()}
             />
-          </Card>
-
-          <Stack direction="row" spacing={2}>
-            <Button variant="outlined" onClick={reset} fullWidth>
-              Reset
-            </Button>
-            {!thumbnailUrl ? (
-              <Button variant="contained" onClick={createThumbnail} disabled={processing} fullWidth>
-                {processing ? 'Creating...' : 'Create Thumbnail'}
-              </Button>
-            ) : (
-              <Button variant="contained" color="success" onClick={downloadThumbnail} fullWidth>
-                Download
-              </Button>
-            )}
+            <Button variant="contained" onClick={grab} sx={{ px: 4 }}>Get</Button>
           </Stack>
-        </Stack>
-      )}
+        </Card>
+
+        {videoId && (
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+            {RES.map((r) => (
+              <Card key={r.key} sx={{ p: 2 }}>
+                <Stack spacing={1.5}>
+                  <Box sx={{ bgcolor: 'action.hover', borderRadius: 1, overflow: 'hidden', minHeight: 100 }}>
+                    <img
+                      src={`https://img.youtube.com/vi/${videoId}/${r.key}.jpg`}
+                      alt={r.label}
+                      style={{ width: '100%', display: 'block' }}
+                    />
+                  </Box>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{r.label}</Typography>
+                  <Button variant="outlined" onClick={() => download(r.key)}>Download</Button>
+                </Stack>
+              </Card>
+            ))}
+          </Box>
+        )}
+      </Stack>
     </ToolLayout>
   );
 }
