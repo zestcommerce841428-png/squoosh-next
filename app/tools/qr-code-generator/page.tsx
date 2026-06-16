@@ -1,152 +1,79 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, Stack, Alert, Typography, TextField, Box, Button } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Card, Stack, Alert, Typography, Box, TextField, Slider, Button } from '@mui/material';
+import QRCode from 'qrcode';
 import { ToolLayout } from '@/components/ToolComponents';
+import { useAuth } from '@/lib/supabase/AuthProvider';
 
-export default function QRCodeGeneratorPage() {
-  const [qrUrl, setQrUrl] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
+export default function QrCodeGeneratorPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [text, setText] = useState('https://zesttechsolution.cloud');
+  const [size, setSize] = useState(320);
+  const [fg, setFg] = useState('#000000');
+  const [bg, setBg] = useState('#ffffff');
   const [error, setError] = useState<string | null>(null);
-  
-  const [text, setText] = useState<string>('https://zesttechsolution.cloud');
-  const [size, setSize] = useState<number>(300);
 
-  const generateQR = async () => {
-    if (!text) return;
+  useEffect(() => {
+    if (!canvasRef.current || !text) return;
+    QRCode.toCanvas(canvasRef.current, text, {
+      width: size,
+      margin: 2,
+      color: { dark: fg, light: bg },
+      errorCorrectionLevel: 'M',
+    }).then(() => setError(null)).catch(() => setError('Could not generate QR code for this input.'));
+  }, [text, size, fg, bg]);
 
-    setProcessing(true);
-    setError(null);
-
-    try {
-      // Simple QR code generation using canvas
-      const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d')!;
-
-      // White background
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, size, size);
-
-      // Simple QR pattern (demo - real implementation would use QR library)
-      ctx.fillStyle = '#000000';
-      const moduleSize = size / 25;
-      
-      // Corner squares (position patterns)
-      const drawCornerSquare = (x: number, y: number) => {
-        ctx.fillRect(x, y, moduleSize * 7, moduleSize * 7);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(x + moduleSize, y + moduleSize, moduleSize * 5, moduleSize * 5);
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(x + moduleSize * 2, y + moduleSize * 2, moduleSize * 3, moduleSize * 3);
-      };
-
-      drawCornerSquare(0, 0);
-      drawCornerSquare(size - moduleSize * 7, 0);
-      drawCornerSquare(0, size - moduleSize * 7);
-
-      // Random data pattern (demo)
-      for (let i = 0; i < 200; i++) {
-        const x = Math.floor(Math.random() * 18 + 3) * moduleSize;
-        const y = Math.floor(Math.random() * 18 + 3) * moduleSize;
-        if (Math.random() > 0.5) {
-          ctx.fillRect(x, y, moduleSize, moduleSize);
-        }
-      }
-
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), 'image/png');
-      });
-
-      const url = URL.createObjectURL(blob);
-      setQrUrl(url);
-    } catch (err) {
-      setError('QR code generation failed. Please try again.');
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const downloadQR = () => {
-    if (!qrUrl) return;
+  const download = () => {
+    if (loading) return;
+    if (!user) { router.push(`/auth/login?next=${encodeURIComponent(pathname || '/')}`); return; }
+    if (!canvasRef.current) return;
     const a = document.createElement('a');
-    a.href = qrUrl;
+    a.href = canvasRef.current.toDataURL('image/png');
     a.download = 'qr-code.png';
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-  };
-
-  const reset = () => {
-    setQrUrl(null);
-    setError(null);
   };
 
   return (
     <ToolLayout
       title="QR Code Generator"
-      description="Generate custom QR codes for URLs, text, WiFi, vCards, and more"
-      features={['URL/Text', 'Custom Size', 'Logo Support', 'Vector Export']}
+      description="Create a high-quality QR code for any link or text, with custom colors and size. Generated in your browser."
+      features={['Any URL or Text', 'Custom Colors', 'High Resolution', 'PNG Download']}
     >
-      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
-      <Stack spacing={3}>
-        {qrUrl && (
-          <Card sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom>Your QR Code</Typography>
-            <Box sx={{ display: 'inline-block', p: 2, bgcolor: 'white' }}>
-              <img src={qrUrl} alt="QR Code" style={{ width: '100%', maxWidth: 400 }} />
-            </Box>
+      <Stack spacing={3} sx={{ maxWidth: 820, mx: 'auto' }}>
+        {error && <Alert severity="error">{error}</Alert>}
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+          <Card sx={{ p: { xs: 2, sm: 3 } }}>
+            <Stack spacing={2.5}>
+              <TextField label="Content (URL or text)" fullWidth multiline minRows={2} value={text} onChange={(e) => setText(e.target.value)} />
+              <Box>
+                <Typography variant="body2">Size: {size}px</Typography>
+                <Slider value={size} min={128} max={1024} step={32} onChange={(_, v) => setSize(v as number)} />
+              </Box>
+              <Stack direction="row" spacing={3}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2">Dots</Typography>
+                  <input aria-label="Foreground color" type="color" value={fg} onChange={(e) => setFg(e.target.value)} style={{ width: 44, height: 38, border: 'none', background: 'none' }} />
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2">Background</Typography>
+                  <input aria-label="Background color" type="color" value={bg} onChange={(e) => setBg(e.target.value)} style={{ width: 44, height: 38, border: 'none', background: 'none' }} />
+                </Box>
+              </Stack>
+            </Stack>
           </Card>
-        )}
-
-        <Card sx={{ p: 3 }}>
-          <Stack spacing={3}>
-            <TextField
-              label="Text or URL"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              fullWidth
-              placeholder="https://example.com"
-              multiline
-              rows={3}
-            />
-
-            <TextField
-              label="Size (px)"
-              type="number"
-              value={size}
-              onChange={(e) => setSize(Math.max(100, Math.min(1000, Number(e.target.value))))}
-              inputProps={{ min: 100, max: 1000 }}
-              fullWidth
-            />
-
-            <Alert severity="info">
-              Scan this QR code with your phone to access: <strong>{text.substring(0, 50)}{text.length > 50 ? '...' : ''}</strong>
-            </Alert>
-          </Stack>
-        </Card>
-
-        <Stack direction="row" spacing={2}>
-          <Button variant="outlined" onClick={reset} fullWidth>
-            Reset
-          </Button>
-          {!qrUrl ? (
-            <Button
-              variant="contained"
-              onClick={generateQR}
-              disabled={processing || !text}
-              fullWidth
-            >
-              {processing ? 'Generating...' : 'Generate QR Code'}
-            </Button>
-          ) : (
-            <Button variant="contained" color="success" onClick={downloadQR} fullWidth>
-              Download
-            </Button>
-          )}
-        </Stack>
+          <Card sx={{ p: { xs: 2, sm: 3 }, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+            <Box sx={{ maxWidth: '100%', overflow: 'auto' }}>
+              <canvas ref={canvasRef} style={{ maxWidth: '100%', height: 'auto' }} />
+            </Box>
+            <Button variant="contained" onClick={download} fullWidth>Download PNG</Button>
+          </Card>
+        </Box>
       </Stack>
     </ToolLayout>
   );
