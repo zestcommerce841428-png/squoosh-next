@@ -20,6 +20,7 @@
     "@types/nodemailer": "^8.0.1",
     "gifenc": "^1.0.3",
     "heic2any": "^0.0.4",
+    "jszip": "^3.10.1",
     "next": "^16.0.0",
     "next-intl": "^4.13.0",
     "nodemailer": "^8.0.11",
