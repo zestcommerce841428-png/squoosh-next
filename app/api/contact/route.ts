@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { verifyReCaptchaToken } from '../../../lib/recaptcha';
+import { SITE_URL, SITE_DOMAIN } from '../../../lib/siteConfig';
 
 // Rate limiting map (in-memory, use Redis in production)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
               </div>
             </div>
             <div class="footer">
-              <p>This email was sent from the contact form at zesttechsolution.cloud</p>
+              <p>This email was sent from the contact form at ${SITE_DOMAIN}</p>
               <p>Reply to this email to respond directly to ${email}</p>
             </div>
           </div>
@@ -183,7 +184,7 @@ export async function POST(request: NextRequest) {
               <p>Our typical response time is within 24 hours during business days (Monday-Friday, 9 AM - 6 PM IST).</p>
               
               <p>In the meantime, feel free to explore more features of Squoosh Next:</p>
-              <a href="https://zesttechsolution.cloud/compress" class="button">Start Compressing Images</a>
+              <a href="${SITE_URL}/compress" class="button">Start Compressing Images</a>
 
               <div class="footer">
                 <p><strong>Naushad Alam</strong><br>
@@ -192,7 +193,7 @@ export async function POST(request: NextRequest) {
                 <p>
                   📧 <a href="mailto:contact@zestcommerce.in">contact@zestcommerce.in</a><br>
                   📱 <a href="tel:+917492068998">+91 74920 68998</a><br>
-                  🌐 <a href="https://zesttechsolution.cloud">zesttechsolution.cloud</a>
+                  🌐 <a href="${SITE_URL}">${SITE_DOMAIN}</a>
                 </p>
               </div>
             </div>

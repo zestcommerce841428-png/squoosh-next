@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Container, Grid, Typography, Stack, Box, Divider } from '@mui/material';
 import BuildStatus from './BuildStatus';
+import { SITE_URL, SITE_DOMAIN } from '../lib/siteConfig';
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <Box component={Link} href={href} sx={{ textDecoration: 'none', color: 'inherit' }}>
@@ -89,8 +90,8 @@ export default function Footer() {
                 contact@zestcommerce.in
               </Box>{' '}
               | Web:{' '}
-              <Box component="a" href="https://zesttechsolution.cloud" target="_blank" rel="noopener noreferrer" sx={{ color: 'inherit', textDecoration: 'underline' }}>
-                zesttechsolution.cloud
+              <Box component="a" href={SITE_URL} target="_blank" rel="noopener noreferrer" sx={{ color: 'inherit', textDecoration: 'underline' }}>
+                {SITE_DOMAIN}
               </Box>
             </Typography>
           </Stack>

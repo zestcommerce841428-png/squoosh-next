@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Container, Typography, Box, Button, Grid, Card, Stack, Chip, Paper, Divider } from '@mui/material';
 import { getLiveToolsCount } from './features/features-data';
+import { SITE_URL } from '../lib/siteConfig';
 
 const LIVE = getLiveToolsCount();
 
@@ -76,11 +77,11 @@ export default function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Squoosh Next',
-    url: 'https://squoosh-next.vercel.app',
+    url: SITE_URL,
     description: 'Professional client-side image compression and format optimization tool supporting 100+ formats.',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://squoosh-next.vercel.app/features?q={search_term_string}',
+      target: `${SITE_URL}/features?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   };

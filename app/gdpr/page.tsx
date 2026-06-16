@@ -1,4 +1,5 @@
 import { Container, Typography, Box, Stack, Card, Grid, Chip, Divider } from '@mui/material';
+import { SITE_DOMAIN } from '../../lib/siteConfig';
 
 export const metadata = {
   title: 'GDPR Compliance - Squoosh Next',
@@ -50,7 +51,7 @@ export default function GDPRPage() {
             <Typography variant="body1"><strong>Controller:</strong> Naushad Alam, trading as Zest Tech Solution</Typography>
             <Typography variant="body1"><strong>Contact Email:</strong> contact@zestcommerce.in</Typography>
             <Typography variant="body1"><strong>WhatsApp:</strong> +91 7492068998</Typography>
-            <Typography variant="body1"><strong>Website:</strong> zesttechsolution.cloud</Typography>
+            <Typography variant="body1"><strong>Website:</strong> {SITE_DOMAIN}</Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mt: 1, lineHeight: 1.7 }}>
               As the Data Controller, Naushad Alam is responsible for determining the purposes and means of any personal data processing associated with this Application. For EU data subject requests, please use the contact details above.
             </Typography>

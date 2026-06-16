@@ -6,6 +6,7 @@ import { Card, Stack, Alert, Typography, Box, TextField, Slider, Button } from '
 import QRCode from 'qrcode';
 import { ToolLayout } from '@/components/ToolComponents';
 import { useAuth } from '@/lib/supabase/AuthProvider';
+import { SITE_URL } from '@/lib/siteConfig';
 
 export default function QrCodeGeneratorPage() {
   const { user, loading } = useAuth();
@@ -13,7 +14,7 @@ export default function QrCodeGeneratorPage() {
   const pathname = usePathname();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [text, setText] = useState('https://zesttechsolution.cloud');
+  const [text, setText] = useState(SITE_URL);
   const [size, setSize] = useState(320);
   const [fg, setFg] = useState('#000000');
   const [bg, setBg] = useState('#ffffff');

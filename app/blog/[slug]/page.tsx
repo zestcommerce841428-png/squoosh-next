@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Container, Typography, Box, Button, Chip, Stack, Card, Divider, Paper } from '@mui/material';
 import { BLOG_POSTS } from '../../../constants/blogData';
+import { SITE_URL } from '../../../lib/siteConfig';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -70,8 +71,8 @@ export default async function BlogPostPage({ params }: Props) {
     description: post.summary,
     datePublished: new Date(post.date).toISOString(),
     author: { '@type': 'Person', name: post.author },
-    publisher: { '@type': 'Organization', name: 'Squoosh Next', logo: { '@type': 'ImageObject', url: 'https://squoosh-next.vercel.app/icon.png' } },
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://squoosh-next.vercel.app/blog/${post.slug}` },
+    publisher: { '@type': 'Organization', name: 'Squoosh Next', logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon.png` } },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${post.slug}` },
   };
 
   const color = getAuthorColor(post.author);

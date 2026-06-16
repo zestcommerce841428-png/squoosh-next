@@ -1,4 +1,5 @@
 import { Container, Typography, Box, Stack, Card, Divider, Chip } from '@mui/material';
+import { SITE_DOMAIN } from '../../lib/siteConfig';
 
 export const metadata = {
   title: 'Privacy Policy - Squoosh Next',
@@ -48,7 +49,7 @@ const SECTIONS = [
   },
   {
     title: '11. Contact',
-    content: `If you have questions, concerns, or requests related to this Privacy Policy or your data rights, please contact:\n\nNaushad Alam — Lead Developer & Founder, Zest Tech Solution\nEmail: contact@zestcommerce.in\nWhatsApp: +91 7492068998\nWebsite: zesttechsolution.cloud`,
+    content: `If you have questions, concerns, or requests related to this Privacy Policy or your data rights, please contact:\n\nNaushad Alam — Lead Developer & Founder, Zest Tech Solution\nEmail: contact@zestcommerce.in\nWhatsApp: +91 7492068998\nWebsite: ${SITE_DOMAIN}`,
   },
 ];
 

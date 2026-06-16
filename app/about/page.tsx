@@ -1,4 +1,5 @@
 import { Container, Typography, Box, Stack, Grid, Card, Chip, Divider, Avatar } from '@mui/material';
+import { SITE_DOMAIN } from '../../lib/siteConfig';
 
 export const metadata = {
   title: 'About Us - Squoosh Next | Zest Tech Solution',
@@ -157,7 +158,7 @@ export default function AboutPage() {
           <Typography variant="body2"><strong>Developer:</strong> Naushad Alam</Typography>
           <Typography variant="body2"><strong>WhatsApp:</strong> +91 7492068998</Typography>
           <Typography variant="body2"><strong>Email:</strong> contact@zestcommerce.in</Typography>
-          <Typography variant="body2"><strong>Web:</strong> zesttechsolution.cloud</Typography>
+          <Typography variant="body2"><strong>Web:</strong> {SITE_DOMAIN}</Typography>
         </Stack>
       </Card>
     </Container>

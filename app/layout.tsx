@@ -9,6 +9,7 @@ import { Box } from '@mui/material';
 import Script from 'next/script';
 import { LanguageProvider } from '../lib/i18n';
 import { AuthProvider } from '../lib/supabase/AuthProvider';
+import { SITE_URL } from '../lib/siteConfig';
 import './globals.css';
 
 // Environment variable for Google Analytics
@@ -17,14 +18,14 @@ const ADSENSE_ID = process.env.NEXT_PUBLIC_ADSENSE_ID;
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 export const metadata = {
-  metadataBase: new URL('https://zesttechsolution.cloud'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Squoosh Next - Premium Image Compressor by Zest Tech Solution',
     template: '%s | Squoosh Next'
   },
   description: 'Professional client-side image compression tool by Zest Tech Solution (Naushad Alam). Compress, resize, and convert JPEG, PNG, WebP, AVIF, and 100+ image formats instantly with zero server uploads. Fast, secure, and privacy-focused.',
   keywords: ['image compressor', 'image compression', 'compress jpeg', 'compress png', 'webp converter', 'avif converter', 'image optimizer', 'client-side compression', 'squoosh next', 'naushad alam', 'zest tech solution', 'free image compressor', 'batch image compression', 'resize images', 'convert image format', 'optimize images'],
-  authors: [{ name: 'Naushad Alam', url: 'https://zesttechsolution.cloud' }],
+  authors: [{ name: 'Naushad Alam', url: SITE_URL }],
   creator: 'Naushad Alam',
   publisher: 'Zest Tech Solution',
   formatDetection: {
@@ -35,13 +36,13 @@ export const metadata = {
   openGraph: {
     title: 'Squoosh Next - Premium Image Compressor',
     description: 'Professional client-side image compression tool. Compress, resize, and convert JPEG, PNG, WebP, AVIF, and 100+ formats instantly. Fast, secure, and privacy-focused.',
-    url: 'https://zesttechsolution.cloud',
+    url: SITE_URL,
     siteName: 'Squoosh Next',
     locale: 'en_US',
     type: 'website',
     images: [
       {
-        url: 'https://zesttechsolution.cloud/og-image.png',
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
         alt: 'Squoosh Next - Premium Image Compressor'
@@ -53,7 +54,7 @@ export const metadata = {
     title: 'Squoosh Next - Premium Image Compressor',
     description: 'Professional client-side image compression. Compress, resize, and convert 100+ image formats instantly. Fast, secure, and privacy-focused.',
     creator: '@NaushadAlam',
-    images: ['https://zesttechsolution.cloud/og-image.png'],
+    images: [`${SITE_URL}/og-image.png`],
   },
   robots: {
     index: true,
@@ -78,7 +79,7 @@ export const metadata = {
     bing: 'bing-verification-code',
   },
   alternates: {
-    canonical: 'https://zesttechsolution.cloud',
+    canonical: SITE_URL,
   },
   category: 'technology',
 };
@@ -88,7 +89,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Squoosh Next",
-    "url": "https://zesttechsolution.cloud",
+    "url": SITE_URL,
     "description": "Premium client-side image compression tool supporting JPEG, PNG, WebP, AVIF, and 100+ file formats without any server uploads.",
     "applicationCategory": "MultimediaApplication",
     "operatingSystem": "All",
@@ -107,7 +108,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       "worksFor": {
         "@type": "Organization",
         "name": "Zest Tech Solution",
-        "url": "https://zesttechsolution.cloud"
+        "url": SITE_URL
       }
     },
     "aggregateRating": {

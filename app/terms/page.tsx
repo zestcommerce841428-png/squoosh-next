@@ -1,4 +1,5 @@
 import { Container, Typography, Box, Stack, Card, Divider, Chip } from '@mui/material';
+import { SITE_DOMAIN } from '../../lib/siteConfig';
 
 export const metadata = {
   title: 'Terms of Service - Squoosh Next',
@@ -56,7 +57,7 @@ const SECTIONS = [
   },
   {
     title: '13. Contact Information',
-    content: `For questions, licensing inquiries, or legal notices regarding these Terms, please contact:\n\nNaushad Alam — Lead Developer & Founder, Zest Tech Solution\nEmail: contact@zestcommerce.in\nWhatsApp: +91 7492068998\nWebsite: zesttechsolution.cloud`,
+    content: `For questions, licensing inquiries, or legal notices regarding these Terms, please contact:\n\nNaushad Alam — Lead Developer & Founder, Zest Tech Solution\nEmail: contact@zestcommerce.in\nWhatsApp: +91 7492068998\nWebsite: ${SITE_DOMAIN}`,
   },
 ];
 

@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
 import { BLOG_POSTS } from '../constants/blogData';
+import { SITE_URL } from '../lib/siteConfig';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://squoosh-next.vercel.app';
+  const baseUrl = SITE_URL;
 
   const staticRoutes = [
     '',
