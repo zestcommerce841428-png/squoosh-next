@@ -103,10 +103,10 @@ export const FEATURES_DATA: FeatureItem[] = [
   { id: 71, category: 'Compression & Optimization', name: 'Custom Quality Compression', description: 'Precise control over quantization tables, smoothing coefficients, and quality factors.', badge: '✅ LIVE', status: 'live', slug: 'custom-quality-compression' },
   { id: 72, category: 'Compression & Optimization', name: 'Bulk Image Compression', description: 'Process multiple images simultaneously in your browser queue.', badge: '✅ LIVE', status: 'live', slug: 'bulk-compression' },
   { id: 73, category: 'Compression & Optimization', name: 'Folder Compression', description: 'Import and compress entire directories keeping directory structure intact.', badge: '✅ LIVE', status: 'live', slug: 'folder-compression' },
-  { id: 74, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: 'WASM Engine', status: 'coming-soon' },
+  { id: 74, category: 'Compression & Optimization', name: 'GIF Optimization', description: 'Frame optimization, delay adjustment, and color dithering controls.', badge: '✅ LIVE', status: 'live', slug: 'gif-optimization' },
 
   // 2. Format Conversion (Remaining)
-  { id: 75, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: 'TIFF Decoder', status: 'coming-soon' },
+  { id: 75, category: 'Format Conversion', name: 'TIFF Converter', description: 'Convert large multi-page TIFF document scans to lightweight web formats.', badge: '✅ LIVE', status: 'live', slug: 'tiff-converter' },
 
   // Continue with remaining 189 features...
   // (I'll add key features from each category to reach 230 total)
