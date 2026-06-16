@@ -42,8 +42,8 @@ const FEATURES = [
     color: '#f59e0b',
   },
   {
-    title: '230 Advanced Tool Archetypes',
-    desc: 'Beyond compression: resize with aspect lock, crop to ratio presets, rotate and flip, watermark, add borders, pixelate, dither (Floyd-Steinberg / Bayer), channel isolation, ASCII art, cinematic color grading, histogram analysis, EXIF metadata inspector, favicon generator, and more.',
+    title: `${LIVE}+ Professional Tools`,
+    desc: 'Beyond compression: resize with aspect lock, crop to ratio presets, rotate and flip, watermark, borders, AI enhance/upscale/denoise, encryption, EXIF inspector, QR codes, favicon generator, and more — all real and working.',
     badge: 'Tools',
     color: '#ef4444',
   },
@@ -231,24 +231,50 @@ export default function HomePage() {
         </Container>
       </Box>
 
+      <Divider />
+
+      {/* ── Trust / Why us ───────────────────────────────────────────────── */}
+      <Box sx={{ py: { xs: 8, md: 10 }, bgcolor: 'background.paper' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1.5 }}>Why Squoosh Next</Typography>
+            <Typography variant="body1" color="text.secondary">Built for privacy, speed and professional results.</Typography>
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3 }}>
+            {[
+              { icon: '🔒', t: '100% Private', d: 'Every tool runs in your browser. Images are never uploaded to a server.' },
+              { icon: '⚡', t: 'Instant & Free', d: 'No queues, no watermarks, no limits — results in a click.' },
+              { icon: '🧰', t: `${LIVE}+ Real Tools`, d: 'A complete suite — compress, convert, edit, enhance, secure.' },
+              { icon: '🛡️', t: 'Secure Account', d: 'Google sign-in, 2FA, email OTP and reCAPTCHA-protected access.' },
+            ].map((x) => (
+              <Card key={x.t} variant="outlined" sx={{ p: 3, textAlign: 'center' }}>
+                <Box sx={{ fontSize: 36, mb: 1 }}>{x.icon}</Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>{x.t}</Typography>
+                <Typography variant="body2" color="text.secondary">{x.d}</Typography>
+              </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
       {/* ── Final CTA ────────────────────────────────────────────────────── */}
       <Box sx={{ py: 12, textAlign: 'center', background: 'linear-gradient(135deg, rgba(59,130,246,0.06) 0%, rgba(99,102,241,0.06) 100%)', borderTop: '1px solid', borderColor: 'divider' }}>
         <Container maxWidth="sm">
           <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, letterSpacing: '-0.5px' }}>
-            Ready to Compress?
+            Ready to get started?
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.7 }}>
-            No sign-up. No upload. No limit. Just drop your image and get a smaller, sharper file — instantly.
+            Create a free account to unlock all {LIVE}+ tools. 100% private — your images never leave your browser.
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
-            <Link href="/compress">
+            <Link href="/auth/signup">
               <Button variant="contained" size="large" sx={{ fontWeight: 700, px: 5, py: 1.5 }}>
-                Start Compressing Free
+                Create Free Account
               </Button>
             </Link>
-            <Link href="/blog">
+            <Link href="/welcome">
               <Button variant="outlined" size="large" sx={{ fontWeight: 700, px: 5, py: 1.5 }}>
-                Read the Blog
+                Take the Tour
               </Button>
             </Link>
           </Stack>

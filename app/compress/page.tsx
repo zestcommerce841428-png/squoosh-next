@@ -1,5 +1,6 @@
 import { Container, Typography, Box } from '@mui/material';
 import ImageCompressor from 'components/ImageCompressor';
+import RequireAuth from 'components/RequireAuth';
 
 export const metadata = {
   title: 'Image Compressor Workspace - Squoosh Next',
@@ -47,7 +48,9 @@ export default function CompressPage() {
         </Typography>
       </Box>
 
-      <ImageCompressor />
+      <RequireAuth label="the compression workspace">
+        <ImageCompressor />
+      </RequireAuth>
     </Container>
   );
 }

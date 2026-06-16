@@ -4,6 +4,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import FloatingDashboard from 'components/FloatingDashboard';
+import CookieConsent from 'components/CookieConsent';
 import { Box } from '@mui/material';
 import Script from 'next/script';
 import { LanguageProvider } from '../lib/i18n';
@@ -149,21 +150,39 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `}
         </Script>
 
-        {/* Google Analytics Integration */}
+        {/* Google Analytics with Consent Mode v2 (denied by default until the user accepts) */}
         {GA_ID && (
           <>
+            <Script id="ga-consent-default" strategy="beforeInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('consent', 'default', {
+                  ad_storage: 'denied',
+                  analytics_storage: 'denied',
+                  ad_user_data: 'denied',
+                  ad_personalization: 'denied',
+                  wait_for_update: 500
+                });
+                try {
+                  var c = localStorage.getItem('cookie-consent');
+                  if (c === 'granted') {
+                    gtag('consent', 'update', {
+                      ad_storage: 'granted', analytics_storage: 'granted',
+                      ad_user_data: 'granted', ad_personalization: 'granted'
+                    });
+                  }
+                } catch (e) {}
+              `}
+            </Script>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
               strategy="afterInteractive"
             />
             <Script id="google-analytics" strategy="afterInteractive">
               {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${GA_ID}', {
-                  page_path: window.location.pathname,
-                });
+                gtag('config', '${GA_ID}', { page_path: window.location.pathname });
               `}
             </Script>
           </>
@@ -198,6 +217,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   </Box>
                   <Footer />
                   <FloatingDashboard />
+                  <CookieConsent />
                 </Box>
               </LanguageProvider>
             </AuthProvider>
