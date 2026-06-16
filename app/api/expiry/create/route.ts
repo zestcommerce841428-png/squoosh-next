@@ -11,7 +11,8 @@ export async function POST(request: Request) {
   const uploadUrl = process.env.HOSTINGER_UPLOAD_URL;
   const secret = process.env.HOSTINGER_UPLOAD_SECRET;
   if (!uploadUrl || !secret) return NextResponse.json({ error: 'Upload is not configured.' }, { status: 500 });
-  const expireUrl = uploadUrl.replace(/upload\.php$/, 'expire.php');
+  // Explicit override, else derive from the upload URL (same folder, expire.php).
+  const expireUrl = process.env.HOSTINGER_EXPIRE_URL || uploadUrl.replace(/upload\.php$/, 'expire.php');
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
